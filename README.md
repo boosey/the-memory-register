@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# memmgmt
 
-## Getting Started
+Local-only web UI for managing your Claude Code configuration surface — CLAUDE.md, skills, slash commands, settings, hooks, keybindings, and auto-memory — across Global, Slug, Plugin, Project, and Local scopes.
 
-First, run the development server:
+## Install & run
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npx memmgmt       # or: bunx memmgmt
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Opens `http://127.0.0.1:<port>` in your default browser. Ctrl-C to exit.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## What it does (v1)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Crawls every Claude Code config artifact on disk.
+- Renders a hybrid scope-layered inventory + React Flow graph.
+- Structured forms per artifact type + raw Monaco escape hatch.
+- Edits flow through diff preview → timestamped backup → one-click undo.
 
-## Learn More
+No LLM, no cloud, no account. Your filesystem is the database.
 
-To learn more about Next.js, take a look at the following resources:
+## Custom port
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+PORT=8080 npx memmgmt
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Default port probing tries 5174–5199 in order. Override `PORT` if you need a specific one.
 
-## Deploy on Vercel
+## Scope coverage
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Scope | Path |
+|---|---|
+| Global | `~/.claude/` |
+| Slug | `~/.claude/projects/<slug>/` |
+| Plugin | `~/.claude/plugins/` |
+| Project | `<project>/CLAUDE.md` + `<project>/.claude/` |
+| Local | `<project>/CLAUDE.local.md` + `<project>/.claude/settings.local.json` |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Editing & safety
+
+- Diff preview before every save.
+- Originals backed up to `~/.claude/memmgmt-backups/<iso>/<relative-path>`.
+- Undo restores the most recent backup.
+- Concurrent-edit detection via file mtime.
+
+## Development
+
+```bash
+pnpm install
+pnpm dev            # hot-reload dev server
+pnpm test           # vitest
+pnpm typecheck
+pnpm build && pnpm memmgmt:launch-dev   # standalone smoke
+```
+
+## License
+
+MIT.

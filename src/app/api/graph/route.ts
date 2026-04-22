@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import path from "node:path";
 import { crawl } from "@/core/discovery";
 import { buildGraph } from "@/core/graph/builder";
 import { resolveHomePaths } from "@/core/paths";
@@ -11,8 +12,12 @@ export async function GET() {
   if (hit) return NextResponse.json(hit);
 
   const paths = resolveHomePaths();
+  const extra = process.env.MEMMGMT_EXTRA_PROJECTS
+    ? process.env.MEMMGMT_EXTRA_PROJECTS.split(path.delimiter).filter(Boolean)
+    : undefined;
   const { raws, ghostSlugs, slugMetadata } = await crawl({
     claudeHome: paths.claudeHome,
+    ...(extra ? { knownProjectPaths: extra } : {}),
   });
   const graph = buildGraph(raws);
   graph.ghostSlugs = ghostSlugs;

@@ -65,7 +65,7 @@ Every view answers *"what does this mean / where does it apply / what overrides 
 
 Three interlocking modes, sharing one underlying node/edge graph:
 
-1. **Scope-layered inventory (default).** Columns for each scope (Global / Slug / Plugin / Project / Local). Within each column, artifacts are grouped by type (CLAUDE.md sections, skills, commands, settings, hooks, memory). Items are cards with title + short intent summary. A "Show connections" toggle overlays import/override edges between columns.
+1. **Scope-layered inventory (default).** Columns for each scope (Global / Slug / Plugin / Project / Local). Within each column, artifacts are grouped by type (CLAUDE.md sections, skills, commands, settings, hooks, memory). Items are cards with title + short intent summary + author badge (Anthropic-official / community-authored / you / unknown — see §5.6.2). A "Show connections" toggle overlays import/override edges between columns. Top-bar filters include author ("Anthropic only", "Community only", specific author name).
 2. **Graph tab.** Full-canvas React Flow rendering of the same graph. Filters for scope, artifact type, and edge type. Zoom and drag.
 3. **Side panel editor.** Opens on click of any artifact in either mode. See §5.5.
 
@@ -81,7 +81,7 @@ Three interlocking modes, sharing one underlying node/edge graph:
   - Typed memory files (`user_*.md`, `feedback_*.md`, `project_*.md`, `reference_*.md`)
   - Keybinding sets (`keybindings.json`)
 
-Each node carries: `id`, `type`, `scope`, `sourceFile`, `title`, `intentSummary`, `rawContent`, `structuredData` (where applicable).
+Each node carries: `id`, `type`, `scope`, `sourceFile`, `title`, `intentSummary`, `author` (see §5.6.2), `rawContent`, `structuredData` (where applicable).
 
 **`intentSummary` derivation (v1, no LLM):** derived deterministically from structural signals in this order:
 1. Frontmatter `description` field, if present (skills, typed memory files).
@@ -179,6 +179,26 @@ Settings files are **explicitly in scope at every applicable level**. Full inven
 - `AGENTS.md` / `GEMINI.md` (cross-agent-vendor memory files) are treated as aliases of `CLAUDE.md` for discovery purposes; the spec follows whichever the project actually uses.
 - Plugin manifest format varies across plugin sources; v1 uses a best-effort heuristic and falls back to filesystem layout if no manifest is found (tracked as an implementation detail in §13).
 - Anything not listed above is out of scope for v1 crawling.
+
+#### 5.6.2 Author / Provenance Resolution
+
+Trust and provenance are first-class in v1. The "official" Claude Code plugin ecosystem is a mix of Anthropic- and community-authored artifacts; users need to see at a glance which is which when deciding what to keep, debug, or remove.
+
+Every node resolves an `author` field during crawl via this precedence:
+
+1. **Plugin-contributed artifact (Plugin scope):** `author` comes from the plugin manifest (`plugin.json` / `.claude-plugin/plugin.json`). Primary source is the manifest's `author` (string) or `authors[0]` (if array). If the manifest includes `publisher` or `vendor`, that is captured as a secondary `publisher` field.
+2. **Skill or command with `author` in frontmatter:** frontmatter `author` wins if present.
+3. **User-authored artifact (Global, Project, Local, Slug):** `author = "self"` (rendered as "You" in UI) unless frontmatter says otherwise.
+4. **Unknown / unresolvable:** `author = null` (rendered as "unknown" with a warning icon — nudges the user to investigate or attribute).
+
+**Special marker:** when `author` string matches `/^anthropic(\s|$|,)/i` or the plugin manifest's `publisher` is `"anthropic"`, the artifact gets an `isOfficial: true` flag. UI renders an Anthropic badge on official artifacts and a distinct style on community-authored ones — so a glance at the inventory tells the user which parts of their setup are vendor-supported vs community-contributed.
+
+**`author` is a filterable and groupable facet** in both the inventory and graph views. Use cases:
+- "Show me every skill authored by X"
+- "Show me only Anthropic-official skills"
+- "Show me every community-authored artifact in my Global scope"
+
+No network calls. No package-registry lookups. Author resolution is purely from local files on disk.
 
 ### 5.7 Session Transcripts in v1
 

@@ -2,6 +2,7 @@
 import { useMemo, useState } from "react";
 import type { Graph, Scope, ArtifactNode } from "@/core/types";
 import { ScopeColumn } from "./ScopeColumn";
+import { GhostSlugsPanel } from "./GhostSlugsPanel";
 
 const ORDER: Scope[] = ["global", "slug", "plugin", "project", "local"];
 
@@ -75,6 +76,7 @@ export function InventoryView({
           <option value="unknown">Unknown</option>
         </select>
       </div>
+      <GhostSlugsPanel graph={graph} />
       <div className="flex gap-3 overflow-x-auto">
         {ORDER.map((s) => {
           const slugProps =

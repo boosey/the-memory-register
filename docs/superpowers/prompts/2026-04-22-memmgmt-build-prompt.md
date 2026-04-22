@@ -23,15 +23,52 @@ Read both files fully before writing any code. Do not skim. The design document 
 
 ## 2. Execution model
 
-Follow the plan linearly. Milestones build on each other; each milestone ends at a demonstrable ship-point.
+Follow the plan's milestones in order. Within a milestone, use **Agent Teams** (`TeamCreate` / `TeamDelete` + task assignment via `TaskUpdate` `owner`) for any tasks that can run in parallel. Never use ad-hoc `Task`-tool subagent fan-out or launch multiple parallel sessions yourself — Agent Teams is the one and only multi-task primitive for this project.
+
+### 2.1 Shared-contracts-first rule (blocking)
+
+**Before any parallel fan-out, Task 1.1 (`src/core/types.ts` — shared types for `ArtifactNode`, `GraphEdge`, `Graph`, `RawArtifact`, `Scope`, `ArtifactKind`) must be complete, committed, and type-checking clean.** This is the contract that every parser, graph component, API route, and UI component in every later milestone depends on. If the types change after fan-out begins, parallel workers will produce mismatches that are expensive to reconcile.
+
+This rule is non-negotiable. It exists because past Agent Teams runs produced frontend/backend mismatches when contracts were written in parallel with consumers.
+
+### 2.2 Parallelizable vs sequential milestones
+
+The plan was written with the following parallelism in mind. Structure each team accordingly:
+
+| Milestone | Parallelism | Why |
+|---|---|---|
+| M0 Scaffold | Sequential | Each step depends on the prior toolchain step. One worker. |
+| M1 Types + Discovery | **Task 1.1 first (blocking), then 1.2 ∥ 1.3** | Slug codec and crawler are independent once types exist. Two workers after contracts land. |
+| M2 Parsers | **Task 2.1 first (frontmatter util), then 2.2–2.8 fully parallel** | Every parser depends only on the frontmatter util. Seven workers. |
+| M3 Graph | **3.1 ∥ 3.2 ∥ 3.3 ∥ 3.4, then 3.5 (builder) alone** | Helpers are independent; builder consumes them all. Four workers, then one. |
+| M4 API routes | **4.1 ∥ 4.2 ∥ 4.3 fully parallel** | Each route is isolated. Three workers. |
+| M5 Inventory view | Mostly sequential (5.1 → 5.2 → 5.3 → 5.4) | Component composition chain. One worker. |
+| M6 Graph view | Sequential. One worker. | Single component. |
+| M7 Editor panel | **7.1 → 7.2, then 7.3 per-kind editors fully parallel** | Per-kind editors are isolated once the dispatcher exists. Five workers. |
+| M8 Save pipeline | **8.1 ∥ 8.2, then 8.3 → 8.4 ∥ 8.5 (routes)** | Diff and backup are independent primitives; writer composes them. Two, then two. |
+| M9 Edit UI | Sequential. One worker. | Each step builds on the prior. |
+| M10 Polish | **10.1 ∥ 10.2 ∥ 10.3, then 10.4 → 10.5 → 10.6** | Three polish items are independent. |
+
+### 2.3 Team workflow per milestone
+
+For each milestone:
+
+1. Create a `TodoWrite` entry per task.
+2. If the milestone has a blocking first task (see table), execute it solo, commit, verify `pnpm typecheck` and `pnpm test` pass.
+3. `TeamCreate` a team sized to the number of parallel-safe tasks.
+4. Create one `TaskCreate` per plan task, assign owners via `TaskUpdate` `owner`. Set `addBlockedBy` dependencies where the plan requires them.
+5. Wait for the team to converge. Review each commit diff against the plan before moving on.
+6. Run `pnpm test` and `pnpm typecheck` against the merged state; fix any cross-worker mismatches before advancing.
+7. `TeamDelete` and proceed to the next milestone.
+
+### 2.4 Execution per task (applies to solo or team workers)
 
 For each task in the plan:
 
-1. Create a TodoWrite entry for the task.
-2. Perform each numbered step in the task in order. The plan's TDD steps (write failing test → run → verify fail → implement → run → verify pass → commit) are **not optional** — skipping tests forfeits the self-correction that makes the rest of the plan reliable.
-3. Run the commands the plan specifies. Verify the expected output. If it does not match, diagnose and fix before moving on; do not paper over failures.
-4. After the final step of each task, commit with the message the plan provides (or a close variant).
-5. Update the TodoWrite entry to completed and proceed to the next task.
+1. Perform each numbered step in order. The plan's TDD steps (write failing test → run → verify fail → implement → run → verify pass → commit) are **not optional** — skipping tests forfeits the self-correction that makes the rest of the plan reliable.
+2. Run the commands the plan specifies. Verify the expected output. If it does not match, diagnose and fix before moving on; do not paper over failures.
+3. After the final step of each task, commit with the message the plan provides (or a close variant).
+4. Update the TodoWrite entry to completed and proceed to the next task.
 
 After completing all tasks in a milestone, run the milestone-level verification (listed in the plan's "Milestone Overview" table) before moving to the next milestone.
 

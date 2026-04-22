@@ -5,6 +5,7 @@ import { TopBar } from "@/components/TopBar";
 import { InventoryView } from "@/components/InventoryView";
 import { ConnectionOverlay } from "@/components/ConnectionOverlay";
 import { GraphView } from "@/components/GraphView";
+import { EditorPanel } from "@/components/editor/EditorPanel";
 
 export default function HomePage() {
   const { graph, loading, error } = useGraph();
@@ -35,6 +36,7 @@ export default function HomePage() {
       {graph && tab === "graph" && (
         <GraphView graph={graph} onSelect={setSelectedId} />
       )}
+      <EditorPanel id={selectedId} onClose={() => setSelectedId(null)} />
     </div>
   );
 }

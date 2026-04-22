@@ -70,9 +70,11 @@ export async function crawl(opts: CrawlOptions): Promise<CrawlResult> {
     claudeHome,
   );
 
-  // Plugin scope
+  // Plugin scope — plugins may live at any depth under ~/.claude/plugins/
+  // (e.g. plugins/cache/<source>/<name>/<version>/.claude-plugin/plugin.json).
+  // Walk the tree and treat the dir containing each manifest as a plugin root.
   const pluginsDir = path.join(claudeHome, "plugins");
-  for (const pluginDir of await listDirs(pluginsDir)) {
+  for (const pluginDir of await findPluginRoots(pluginsDir)) {
     const manifestCandidates = [
       path.join(pluginDir, ".claude-plugin", "plugin.json"),
       path.join(pluginDir, "plugin.json"),
@@ -308,4 +310,35 @@ async function pushDirFiles(
 
 function makeId(kind: string, scope: Scope, sourceFile: string): string {
   return `${kind}::${scope}::${sourceFile}`;
+}
+
+async function findPluginRoots(pluginsRoot: string): Promise<string[]> {
+  if (!(await dirExists(pluginsRoot))) return [];
+  const roots = new Set<string>();
+  const stack = [pluginsRoot];
+  const MAX_DEPTH = 8;
+  const depths = new Map<string, number>([[pluginsRoot, 0]]);
+  while (stack.length) {
+    const cur = stack.pop()!;
+    const depth = depths.get(cur) ?? 0;
+    // Is `cur` a plugin root? Check for manifest candidates.
+    const manifestCandidates = [
+      path.join(cur, ".claude-plugin", "plugin.json"),
+      path.join(cur, "plugin.json"),
+    ];
+    let matched = false;
+    for (const m of manifestCandidates) {
+      if (await fileExists(m)) {
+        roots.add(cur);
+        matched = true;
+        break;
+      }
+    }
+    if (matched || depth >= MAX_DEPTH) continue;
+    for (const child of await listDirs(cur)) {
+      depths.set(child, depth + 1);
+      stack.push(child);
+    }
+  }
+  return Array.from(roots);
 }

@@ -2,6 +2,7 @@ import {
   ENTITY_TYPE_ORDER,
   type Entity,
   type EntityType,
+  type PseudoNode,
   type Relation,
 } from "@/core/entities";
 import { TYPE_LABELS } from "./typeLabels";
@@ -9,6 +10,7 @@ import { TYPE_LABELS } from "./typeLabels";
 interface TypeTabsProps {
   entities: readonly Entity[];
   relations: readonly Relation[];
+  pseudoNodes: readonly PseudoNode[];
   activeType: EntityType;
   pinnedId: string | null;
   onSelectType: (t: EntityType) => void;
@@ -50,6 +52,7 @@ function computeRelatedByType(
 export function TypeTabs({
   entities,
   relations,
+  pseudoNodes,
   activeType,
   pinnedId,
   onSelectType,
@@ -60,13 +63,19 @@ export function TypeTabs({
   }
   const relatedByType = computeRelatedByType(pinnedId, entities, relations);
 
+  const slugs = (
+    pseudoNodes.filter((p) => p.kind === "slug") as any[]
+  ).sort((a, b) => a.name.localeCompare(b.name));
+
   return (
     <div
       data-testid="type-tabs"
       className="border-b border-[color:var(--rule)] px-7 pt-[14px]"
     >
-      <div className="smallcaps mb-2 text-[10px] text-[color:var(--text-muted)]">
-        Trace by entity kind
+      <div className="mb-2">
+        <div className="smallcaps text-[10px] text-[color:var(--text-muted)]">
+          Trace by entity kind
+        </div>
       </div>
       <div className="flex flex-wrap items-end gap-5">
         {ENTITY_TYPE_ORDER.map((t) => {

@@ -21,6 +21,8 @@ function structured(entity: Entity): ParsedTypedMemory {
 
 interface MemoryEditorProps extends TypedEditorProps {
   relations?: readonly Relation[];
+  onDeleted?: () => void;
+  onSaved?: () => void;
 }
 
 export function MemoryEditor({
@@ -28,11 +30,13 @@ export function MemoryEditor({
   onApiReady,
   onTitleChange,
   relations = [],
+  onDeleted,
+  onSaved,
 }: MemoryEditorProps) {
   const initial = useMemo(() => structured(entity), [entity]);
   const [filename, setFilename] = useState(initial.name || entity.title);
   const [body, setBody] = useState(initial.body ?? "");
-  const [dismissing, setDismissing] = useState(false);
+  const [busy, setBusy] = useState<"delete" | "dismiss-stale" | null>(null);
   const [note, setNote] = useState<string | null>(null);
 
   const accretesRel = useMemo(
@@ -59,8 +63,35 @@ export function MemoryEditor({
     });
   }, [filename, body, entity, initial, onApiReady]);
 
-  async function dismiss() {
-    setDismissing(true);
+  async function handleDelete() {
+    if (!window.confirm("Delete this memory file? This cannot be undone.")) return;
+    setBusy("delete");
+    setNote(null);
+    try {
+      const r = await fetch("/api/bulk", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          action: "delete-entity",
+          entityIds: [entity.id],
+          confirm: true,
+        }),
+      });
+      const j = await r.json();
+      if (!j.ok) setNote(String(j.reason ?? "delete failed"));
+      else {
+        setNote("Memory deleted.");
+        onDeleted?.();
+      }
+    } catch (e) {
+      setNote(String(e));
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function handleDismissStale() {
+    setBusy("dismiss-stale");
     setNote(null);
     try {
       const r = await fetch("/api/bulk", {
@@ -74,11 +105,14 @@ export function MemoryEditor({
       });
       const j = await r.json();
       if (!j.ok) setNote(String(j.reason ?? "dismiss failed"));
-      else setNote("Stale flag cleared.");
+      else {
+        setNote("Stale flag cleared.");
+        onSaved?.(); // Refetch to update stale flag in UI
+      }
     } catch (e) {
       setNote(String(e));
     } finally {
-      setDismissing(false);
+      setBusy(null);
     }
   }
 
@@ -154,14 +188,27 @@ export function MemoryEditor({
           >
             View source turns
           </button>
+
+          {entity.stale && (
+            <button
+              type="button"
+              onClick={handleDismissStale}
+              disabled={busy !== null}
+              className={ghost.className}
+              style={ghost.style}
+            >
+              {busy === "dismiss-stale" ? "clearing…" : "Dismiss stale flag"}
+            </button>
+          )}
+
           <button
             type="button"
-            onClick={dismiss}
-            disabled={dismissing}
+            onClick={handleDelete}
+            disabled={busy !== null}
             className={destructive.className}
             style={destructive.style}
           >
-            {dismissing ? "dismissing…" : "Dismiss memory"}
+            {busy === "delete" ? "deleting…" : "Dismiss memory"}
           </button>
         </div>
         {note && (

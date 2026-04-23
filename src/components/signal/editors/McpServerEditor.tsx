@@ -71,7 +71,7 @@ export function McpServerEditor({
           checked={enabled}
           onChange={(e) => setEnabled(e.target.checked)}
         />
-        <label htmlFor="mcp-enabled" className="text-[13px] font-medium text-[color:var(--ink)]">
+        <label htmlFor="mcp-enabled" className="text-[20px] font-medium text-[color:var(--ink)]">
           Enabled
         </label>
       </div>

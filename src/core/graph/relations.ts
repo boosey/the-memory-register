@@ -118,6 +118,7 @@ export function deriveImports(
       // File-missing case: always a broken import targeted at path pseudo-node.
       if (!abs || !exists(abs)) {
         registry.registerPath(atPath, true);
+        e.hasDeadImports = true;
         out.push({
           id: `imports::${e.id}->${atPath}`,
           kind: "imports",

@@ -64,7 +64,8 @@ async function handleRemove(
 
   const sections = parseClaudeMd(entity.rawContent);
   const barePath = targetPath.startsWith("@") ? targetPath.slice(1) : targetPath;
-  const pathRegex = new RegExp(`@${escapeRegExp(barePath)}\\b`, "g");
+  // Match @path followed by space, punctuation that terminates an import, or EOF.
+  const pathRegex = new RegExp(`@${escapeRegExp(barePath)}(?=[\\s)<>]|$)`, "g");
   
   let modified = false;
   for (const s of sections) {
@@ -121,7 +122,8 @@ async function handleUpdate(
   });
 
   const sections = parseClaudeMd(entity.rawContent);
-  const oldRegex = new RegExp(`@${escapeRegExp(oldPath)}\\b`, "g");
+  const bareOld = oldPath.startsWith("@") ? oldPath.slice(1) : oldPath;
+  const oldRegex = new RegExp(`@${escapeRegExp(bareOld)}(?=[\\s)<>]|$)`, "g");
   const replacement = newPath.startsWith("@") ? newPath : `@${newPath}`;
 
   let modified = false;

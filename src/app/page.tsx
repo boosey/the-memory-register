@@ -8,10 +8,12 @@ import {
   type GraphPayload,
   type PseudoNode,
   type Relation,
+  type SlugPseudoNode,
 } from "@/core/entities";
 import { Footer } from "@/components/signal/Footer";
 import { HealthRibbon } from "@/components/signal/HealthRibbon";
 import { Masthead } from "@/components/signal/Masthead";
+import { ProjectSelect } from "@/components/signal/ProjectSelect";
 import { SchematicHeader } from "@/components/signal/SchematicHeader";
 import { SignalRow } from "@/components/signal/SignalRow";
 import { TracingBanner } from "@/components/signal/TracingBanner";
@@ -21,6 +23,7 @@ import { EditorDrawer } from "@/components/signal/EditorDrawer";
 import { BulkActionBar } from "@/components/signal/BulkActionBar";
 import { UndoToaster } from "@/components/signal/UndoToast";
 import { BrokenImportModal } from "@/components/signal/BrokenImportModal";
+import { GhostSlugModal } from "@/components/signal/GhostSlugModal";
 import { PinnedProvider, usePinned } from "@/hooks/usePinned";
 import { SelectionProvider, useSelection } from "@/hooks/useSelection";
 import {
@@ -28,6 +31,7 @@ import {
   groupMatchesFilter,
   useHealthFilter,
 } from "@/hooks/useHealthFilter";
+import { ProjectFilterProvider, useProjectFilter } from "@/hooks/useProjectFilter";
 import { useGraph } from "@/hooks/useGraph";
 
 export default function HomePage() {
@@ -35,8 +39,10 @@ export default function HomePage() {
     <PinnedProvider>
       <SelectionProvider>
         <HealthFilterProvider>
-          <SignalFlowPage />
-          <UndoToaster />
+          <ProjectFilterProvider>
+            <SignalFlowPage />
+            <UndoToaster />
+          </ProjectFilterProvider>
         </HealthFilterProvider>
       </SelectionProvider>
     </PinnedProvider>
@@ -129,7 +135,9 @@ function Loaded({
   const { pinnedId, pin, unpin } = usePinned();
   const selection = useSelection();
   const healthFilter = useHealthFilter();
+  const projectFilter = useProjectFilter();
   const [expandedKey, setExpandedKey] = useState<string | null>(null);
+  const [manageGhostsOpen, setManageGhostsOpen] = useState(false);
   const [brokenImport, setBrokenImport] = useState<{
     relation: Relation;
     importer: Entity;
@@ -163,10 +171,32 @@ function Loaded({
     return { out, inb };
   }, [graph.relations]);
 
+  const activeProject = useMemo(() => {
+    if (!projectFilter.activeSlug) return null;
+    return graph.pseudoNodes.find(
+      (p) => p.kind === "slug" && p.name === projectFilter.activeSlug,
+    ) as SlugPseudoNode | undefined;
+  }, [graph.pseudoNodes, projectFilter.activeSlug]);
+
+  const filteredEntities = useMemo(() => {
+    if (!activeProject) return graph.entities;
+    return graph.entities.filter((e) => {
+      // Global and plugin scopes always apply.
+      if (e.scope === "global" || e.scope === "plugin") return true;
+      // Slug scope must match the selected slug.
+      if (e.scope === "slug") return e.slugRef === activeProject.name;
+      // Project and local scopes must match the decoded project path.
+      if (e.scope === "project" || e.scope === "local") {
+        return e.scopeRoot === activeProject.projectPath;
+      }
+      return false;
+    });
+  }, [graph.entities, activeProject]);
+
   const rows = useMemo(() => {
-    const filtered = graph.entities.filter((e) => e.type === activeType);
-    return groupByIdentity(filtered);
-  }, [graph.entities, activeType]);
+    const byType = filteredEntities.filter((e) => e.type === activeType);
+    return groupByIdentity(byType);
+  }, [filteredEntities, activeType]);
 
   const visibleRows = useMemo(
     () =>
@@ -220,7 +250,10 @@ function Loaded({
   return (
     <main className="flex min-h-full flex-1 flex-col pb-[72px]">
       <Masthead />
-      <HealthRibbon graph={graph} />
+      <HealthRibbon
+        graph={graph}
+        onManageGhosts={() => setManageGhostsOpen(true)}
+      />
       {pinnedTarget && (
         <TracingBanner
           pinned={pinnedTarget}
@@ -230,8 +263,9 @@ function Loaded({
         />
       )}
       <TypeTabs
-        entities={graph.entities}
+        entities={filteredEntities}
         relations={graph.relations}
+        pseudoNodes={graph.pseudoNodes}
         activeType={activeType}
         pinnedId={pinnedId}
         onSelectType={setActiveType}
@@ -299,7 +333,7 @@ function Loaded({
       </div>
 
       <Footer detections={graph.detections} />
-      <BulkActionBar entities={graph.entities} onApplied={handleSaved} />
+      <BulkActionBar entities={filteredEntities} onApplied={handleSaved} />
       {brokenImport && (
         <BrokenImportModal
           relation={brokenImport.relation}
@@ -308,6 +342,18 @@ function Loaded({
           onClose={() => setBrokenImport(null)}
           onResolved={() => {
             setBrokenImport(null);
+            refetch();
+          }}
+        />
+      )}
+      {manageGhostsOpen && (
+        <GhostSlugModal
+          ghosts={graph.pseudoNodes.filter(
+            (p) => p.kind === "slug" && p.isGhost,
+          ) as any[]}
+          onClose={() => setManageGhostsOpen(false)}
+          onRemoved={() => {
+            setManageGhostsOpen(false);
             refetch();
           }}
         />

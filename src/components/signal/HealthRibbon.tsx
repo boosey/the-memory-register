@@ -4,9 +4,11 @@ import {
   useHealthFilter,
   type HealthFilterKey,
 } from "@/hooks/useHealthFilter";
+import { ProjectSelect } from "./ProjectSelect";
 
 interface HealthRibbonProps {
   graph: GraphPayload;
+  onManageGhosts?: () => void;
 }
 
 type Severity = "error" | "warn" | "info";
@@ -63,7 +65,7 @@ const SEV_BG: Record<Severity, string> = {
   info: "oklch(0.60 0.05 240)",
 };
 
-export function HealthRibbon({ graph }: HealthRibbonProps) {
+export function HealthRibbon({ graph, onManageGhosts }: HealthRibbonProps) {
   const filter = useHealthFilter();
 
   const chips: Chip[] = [
@@ -96,13 +98,20 @@ export function HealthRibbon({ graph }: HealthRibbonProps) {
   const ghosts = countGhostSlugs(graph.pseudoNodes);
   const totalIssues = chips.reduce((n, c) => n + c.count, 0);
 
+  const slugs = (
+    graph.pseudoNodes.filter((p) => p.kind === "slug") as any[]
+  ).sort((a, b) => a.name.localeCompare(b.name));
+
   return (
     <div
       data-testid="health-ribbon"
       className="flex items-center gap-[10px] border-y border-[color:var(--rule)] bg-[color:var(--paper-deep)] px-[18px] py-2"
     >
-      <div className="smallcaps mr-[6px] text-[9.5px] text-[color:var(--text-muted)]">
-        Health
+      <div className="flex items-center gap-6">
+        <ProjectSelect slugs={slugs} />
+        <div className="smallcaps text-[9.5px] text-[color:var(--text-muted)]">
+          Health
+        </div>
       </div>
       {chips.map((c) => {
         const active = filter.active === c.key;
@@ -153,11 +162,26 @@ export function HealthRibbon({ graph }: HealthRibbonProps) {
           clear filter
         </button>
       )}
-      <span
-        className="font-mono text-[10px] text-[color:var(--text-muted)]"
+      <button
+        type="button"
+        onClick={onManageGhosts}
+        disabled={ghosts === 0}
+        className={[
+          "cursor-pointer border-none bg-transparent font-mono text-[10px]",
+          ghosts > 0
+            ? "text-[color:var(--ink)] hover:underline"
+            : "text-[color:var(--text-muted)] opacity-50",
+        ].join(" ")}
         style={{ letterSpacing: "0.08em" }}
       >
-        {ghosts} ghost slug{ghosts === 1 ? "" : "s"} · {totalIssues} issue
+        {ghosts} ghost slug{ghosts === 1 ? "" : "s"}
+      </button>
+      <span
+        className="font-mono text-[10px] text-[color:var(--ink)]"
+        style={{ letterSpacing: "0.08em" }}
+      >
+        {" · "}
+        {totalIssues} issue
         {totalIssues === 1 ? "" : "s"}
       </span>
     </div>

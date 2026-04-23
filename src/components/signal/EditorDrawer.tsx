@@ -64,7 +64,7 @@ export function EditorDrawer({
     const common = { entity, onApiReady, onTitleChange };
     switch (t) {
       case "standing-instruction":
-        return <StandingInstructionEditor {...common} />;
+        return <StandingInstructionEditor {...common} relations={relations} />;
       case "permission":
         return <PermissionEditor {...common} />;
       case "skill":
@@ -80,7 +80,17 @@ export function EditorDrawer({
           />
         );
       case "memory":
-        return <MemoryEditor {...common} relations={relations} />;
+        return (
+          <MemoryEditor
+            {...common}
+            relations={relations}
+            onDeleted={() => {
+              onSaved();
+              onClose();
+            }}
+            onSaved={onSaved}
+          />
+        );
       case "hook":
         return <HookEditor {...common} />;
       case "env":

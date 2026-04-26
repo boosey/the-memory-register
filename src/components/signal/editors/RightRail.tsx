@@ -183,7 +183,7 @@ export function RightRail({
         >
           {pending === "save" ? "saving…" : "Save with backup"}
         </button>
-        {!entity.plugin && (
+        {!(entity.plugin && entity.type !== "plugin") && (
           <button
             type="button"
             onClick={handleDelete}

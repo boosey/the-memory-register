@@ -629,8 +629,9 @@ async function deleteFileEntity(
   entity: Entity,
   ctx: BulkContext,
 ): Promise<DeleteResult> {
-  // Plugin-contributed entities are locked.
-  if (entity.plugin) {
+  // Artifacts contributed by a plugin (skills, commands, etc.) are read-only.
+  // The plugin manifest itself is NOT read-only so that duplicates can be pruned.
+  if (entity.plugin && entity.type !== "plugin") {
     return {
       ok: false,
       reason: "action-not-applicable",

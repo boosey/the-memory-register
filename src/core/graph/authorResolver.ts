@@ -31,7 +31,7 @@ export function resolveAuthor(input: ResolveInput): ResolvedAuthor {
   }
 
   const mf = input.pluginManifest;
-  if (mf && (mf.author || mf.publisher)) {
+  if (mf) {
     const isOfficial =
       (mf.author != null && ANTHROPIC_RE.test(mf.author)) ||
       isAnthropicPublisher(mf.publisher);

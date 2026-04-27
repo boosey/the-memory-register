@@ -20,7 +20,7 @@ export type SettingsEntry =
       entryKey: string;
       server: ParsedMcpServer;
     }
-  | { kind: "enabled-plugins"; entryKey: string; plugins: string[] }
+  | { kind: "enabled-plugins"; entryKey: string; plugins: string[] | Record<string, boolean> }
   | { kind: "other"; entryKey: string; key: string; value: unknown };
 
 export interface ParsedSettings {
@@ -116,7 +116,9 @@ export function parseSettings(src: string): ParsedSettings {
   entries.push({
     kind: "enabled-plugins",
     entryKey: "enabledPlugins",
-    plugins: Array.isArray(enabledPlugins) ? (enabledPlugins as string[]) : [],
+    plugins: (Array.isArray(enabledPlugins) || (enabledPlugins && typeof enabledPlugins === "object"))
+      ? (enabledPlugins as any)
+      : [],
   });
 
   const unknownTopLevelKeys: string[] = [];

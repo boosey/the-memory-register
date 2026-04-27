@@ -33,6 +33,7 @@ export function buildGraph(raws: RawArtifact[], opts: BuildOptions = {}): Graph 
 
   const pluginManifestByRoot = new Map<string, PluginManifestInfo>();
   const enabledPlugins = new Set<string>();
+  let enabledPluginsFound = false;
 
   for (const r of raws) {
     if (r.kind === "plugin-manifest") {
@@ -52,11 +53,19 @@ export function buildGraph(raws: RawArtifact[], opts: BuildOptions = {}): Graph 
     if (r.kind === "settings-entry") {
       try {
         const parsed = parseSettings(r.rawContent);
-        const ep = parsed.raw.enabledPlugins;
-        if (Array.isArray(ep)) {
-          ep.forEach((p) => {
-            if (typeof p === "string") enabledPlugins.add(p);
-          });
+        if ("enabledPlugins" in parsed.raw) {
+          enabledPluginsFound = true;
+          const ep = parsed.raw.enabledPlugins;
+          if (Array.isArray(ep)) {
+            ep.forEach((p) => {
+              if (typeof p === "string") enabledPlugins.add(p);
+            });
+          } else if (ep && typeof ep === "object") {
+            // Support object map format: { "plugin-name": true/false }
+            for (const [name, enabled] of Object.entries(ep)) {
+              if (enabled === true) enabledPlugins.add(name);
+            }
+          }
         }
       } catch {
         /* ignore settings parse errors here, handled in loop below */
@@ -98,7 +107,7 @@ export function buildGraph(raws: RawArtifact[], opts: BuildOptions = {}): Graph 
           nodes.push(emitKeybindings(r));
           break;
         case "plugin-manifest":
-          nodes.push(...emitPluginManifest(r, enabledPlugins));
+          nodes.push(...emitPluginManifest(r, enabledPlugins, enabledPluginsFound));
           break;
       }
     } catch (e) {
@@ -443,6 +452,7 @@ function emitKeybindings(r: RawArtifact): ArtifactNode {
 function emitPluginManifest(
   r: RawArtifact,
   enabledPlugins: Set<string>,
+  enabledPluginsFound: boolean,
 ): ArtifactNode[] {
   const parsed = parsePluginManifest(r.rawContent, r.sourceFile);
   const author = resolveAuthor({
@@ -450,7 +460,9 @@ function emitPluginManifest(
     frontmatterAuthor: null,
     pluginManifest: { author: parsed.author, publisher: parsed.publisher },
   });
-  const isEnabled = enabledPlugins.has(parsed.name);
+  const isEnabled = !enabledPluginsFound || 
+    enabledPlugins.has(parsed.name) || 
+    Array.from(enabledPlugins).some(p => p.startsWith(parsed.name + "@"));
   const out: ArtifactNode[] = [
     baseNode(
       r,

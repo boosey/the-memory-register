@@ -8,6 +8,7 @@ import {
   type BulkResponse,
 } from "@/core/apiContracts";
 import { Chip, FormRow, ecBtnClass } from "./shared";
+import { useProjectFilter } from "@/hooks/useProjectFilter";
 
 interface ScopeMoverProps {
   entity: Entity;
@@ -20,6 +21,7 @@ interface ScopeMoverProps {
  * in one transaction.
  */
 export function ScopeMover({ entity, onMoved }: ScopeMoverProps) {
+  const { activeSlug } = useProjectFilter();
   const [scope, setScope] = useState<Scope>(entity.scope);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -35,8 +37,13 @@ export function ScopeMover({ entity, onMoved }: ScopeMoverProps) {
   }
 
   const action = scope === entity.scope ? null : scopeToAction(scope);
-  const disabled = action === null || pending;
+  const isDemotion = action === "demote-scope";
+  const isBlockedDemotion = isDemotion && !activeSlug;
+  const disabled = action === null || isBlockedDemotion || pending;
   const saveBtn = ecBtnClass(true);
+
+  const isAutoToManual = entity.scope === "slug" && scope !== "slug";
+  const isManualToAuto = entity.scope !== "slug" && scope === "slug";
 
   async function save() {
     if (!action) return;
@@ -98,6 +105,35 @@ export function ScopeMover({ entity, onMoved }: ScopeMoverProps) {
           )}
         </div>
       </FormRow>
+
+      {isBlockedDemotion && (
+        <div className="mt-4 rounded-sm border border-[color:var(--semantic-error)] bg-[color:var(--semantic-error-tint)] px-3 py-2 text-[12px] text-[color:var(--ink)]">
+          <div className="mb-1 font-bold">Project Selection Required</div>
+          <p>
+            To demote an entity (move it to a lower scope), you must first select a <b>target project</b> in the top navigation. 
+            This tells Claude Code which project the entity should be moved into.
+          </p>
+        </div>
+      )}
+
+      {(isAutoToManual || isManualToAuto) && !isBlockedDemotion && (
+        <div className="mt-4 rounded-sm border border-[color:var(--author-community)] bg-[color:var(--author-community-tint)] px-3 py-2 text-[12px] text-[color:var(--ink)]">
+          <div className="mb-1 font-bold">Scope Conversion Warning</div>
+          {isAutoToManual && (
+            <p>
+              Moving an <b>Auto-Memory</b> note to a manual scope will convert it into a <b>Standing Instruction</b> in <code className="bg-[color:var(--paper)] px-1 rounded">CLAUDE.md</code>. 
+              Claude will no longer manage this note automatically.
+            </p>
+          )}
+          {isManualToAuto && (
+            <p>
+              Moving a <b>Manual Instruction</b> to the Slug scope will convert it into <b>Auto-Memory</b> in <code className="bg-[color:var(--paper)] px-1 rounded">MEMORY.md</code>. 
+              It will become part of the agent's self-managed context.
+            </p>
+          )}
+        </div>
+      )}
+
       <div className="mt-4 flex items-center gap-2">
         <button
           type="button"

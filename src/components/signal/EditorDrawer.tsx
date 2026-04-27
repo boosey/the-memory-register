@@ -156,7 +156,7 @@ export function EditorDrawer({
           {(
             [
               ["edit", "Edit"],
-              ...(!entity.plugin
+              ...(!entity.plugin || entity.type === "plugin"
                 ? ([["scope", "Move scope"]] as const)
                 : []),
               ...(contested ? ([["resolve", "Resolve conflict"]] as const) : []),

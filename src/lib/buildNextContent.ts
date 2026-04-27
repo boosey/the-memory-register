@@ -221,15 +221,29 @@ function buildEnabledPlugins(entity: Entity, draft: EnabledPluginsDraft): string
 function buildPluginToggle(entity: Entity, draft: PluginToggleDraft): string {
   const parsed = parseSettings(entity.rawContent);
   const raw = JSON.parse(JSON.stringify(parsed.raw)) as Record<string, unknown>;
-  const plugins = new Set((raw.enabledPlugins as string[] | undefined) ?? []);
+  const current = raw.enabledPlugins;
 
-  if (draft.enabled) {
-    plugins.add(draft.pluginName);
+  if (Array.isArray(current)) {
+    const plugins = new Set(current);
+    if (draft.enabled) {
+      plugins.add(draft.pluginName);
+    } else {
+      plugins.delete(draft.pluginName);
+    }
+    raw.enabledPlugins = Array.from(plugins).sort();
+  } else if (current && typeof current === "object") {
+    const plugins = { ...current } as Record<string, boolean>;
+    plugins[draft.pluginName] = draft.enabled;
+    raw.enabledPlugins = plugins;
   } else {
-    plugins.delete(draft.pluginName);
+    // Default to array if missing or invalid
+    const plugins = new Set<string>();
+    if (draft.enabled) {
+      plugins.add(draft.pluginName);
+    }
+    raw.enabledPlugins = Array.from(plugins).sort();
   }
 
-  raw.enabledPlugins = Array.from(plugins).sort();
   return serializeSettings({ ...parsed, raw });
 }
 

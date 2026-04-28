@@ -74,10 +74,4 @@ export const TYPE_LABELS: Record<EntityType, TypeLabel> = {
     glyph: "⎔",
     blurb: "Model Context Protocol servers registered in settings.",
   },
-  "enabled-plugins": {
-    label: "Enabled Plugins",
-    plural: "Enabled Plugins",
-    glyph: "🔌",
-    blurb: "List of active plugins in settings.json.",
-  },
 };

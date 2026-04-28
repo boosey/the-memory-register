@@ -58,6 +58,9 @@ export function PluginEditor({
     baseRaw.name = name;
     if (source) baseRaw.repository = source;
     
+    // We detect if only the enabled state changed. If so, we target settings.json.
+    // If other things changed, we target the manifest (which usually doesn't 
+    // have an 'enabled' field, but some might).
     const nameChanged = name !== (initial.name ?? entity.title);
     const sourceChanged = source !== (initial.source ?? (initial.raw?.repository as string) ?? "");
     const enabledChanged = enabled !== (initial.enabled ?? true);
@@ -79,6 +82,7 @@ export function PluginEditor({
       ...(isOnlyToggle && activeSettings ? {
         sourceFile: activeSettings.sourceFile,
         scopeRoot: activeSettings.scopeRoot,
+        expectedMtimeMs: activeSettings.mtimeMs,
       } : {})
     });
   }, [name, source, enabled, entity, initial, onApiReady, activeSettings]);
@@ -113,7 +117,7 @@ export function PluginEditor({
           className={monoClass()}
         />
       </FormRow>
-      <FormRow label="State">
+      <FormRow label="State" hint="Toggling this updates your settings.json to enable or disable the plugin.">
         <div className="flex flex-col gap-3">
           <label className="flex cursor-pointer items-center gap-2">
             <input
@@ -136,8 +140,8 @@ export function PluginEditor({
             </span>
             <span className="text-[11px] text-[color:var(--text-faint)] italic">
               {projectSettings 
-                ? "Changes will only affect this project." 
-                : "No project settings found; changes will be global."}
+                ? "State changes will be saved to your project settings." 
+                : "No project settings found; state changes will be saved globally."}
             </span>
           </div>
         </div>

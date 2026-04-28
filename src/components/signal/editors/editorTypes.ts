@@ -8,6 +8,7 @@ export interface EditorApi {
   stanzas?: string[];
   sourceFile?: string;
   scopeRoot?: string;
+  expectedMtimeMs?: number;
 }
 
 export interface TypedEditorProps {

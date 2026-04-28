@@ -50,4 +50,14 @@ describe("parsePermissionValue / formatPermissionValue", () => {
     });
     expect(formatPermissionValue("Write", "")).toBe("Write");
   });
+
+  it("handles complex MCP tool names with hyphens and underscores", () => {
+    const mcpTool = "mcp__plugin_chrome-devtools-mcp_chrome-devtools__evaluate_script";
+    const parsed = parsePermissionValue(`${mcpTool}(args)`);
+    expect(parsed).toEqual({
+      tool: mcpTool,
+      pattern: "args",
+    });
+    expect(formatPermissionValue(parsed.tool, parsed.pattern)).toBe(`${mcpTool}(args)`);
+  });
 });

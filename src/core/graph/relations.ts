@@ -219,7 +219,7 @@ export function deriveFiresOn(
 // ── gates ───────────────────────────────────────────────────────────────────
 // permission entity → tool:<prefix> pseudo-node. Prefix-only; regex below.
 
-const PERM_PREFIX_RE = /^(\w+|\*)(?:\(.*\))?$/;
+const PERM_PREFIX_RE = /^([^\s(]+)(?:\(.*\))?$/;
 
 export function deriveGates(
   permissionEntities: Entity[],

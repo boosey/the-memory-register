@@ -68,6 +68,13 @@ export interface McpServerDraft {
   raw: Record<string, unknown>;
 }
 
+export interface McpConsolidateDraft {
+  kind: "consolidate-permissions";
+  toWildcard: string; // e.g. "mcp__server__*"
+  toRemoveValues: string[]; // values of permissions to remove (e.g. "mcp__server__foo")
+  allRelatedPermissions: Entity[]; // Full list of permission entities to potentially remove
+}
+
 export interface EnabledPluginsDraft {
   plugins: string[];
 }
@@ -211,6 +218,36 @@ function buildMcpServer(entity: Entity, draft: McpServerDraft): string {
   return serializeSettings({ ...parsed, raw });
 }
 
+function buildMcpConsolidate(entity: Entity, draft: McpConsolidateDraft): string {
+  const parsed = parseSettings(entity.rawContent);
+  const raw = JSON.parse(JSON.stringify(parsed.raw)) as Record<string, any>;
+  const perms = (raw.permissions ??= {});
+  const allow = (perms.allow ??= []) as string[];
+
+  // Identify all values we want to remove
+  const toRemoveValues = new Set(draft.toRemoveValues);
+  
+  // Also identify permissions that specifically belong to this file (sourceFile match)
+  const entitiesInThisFile = draft.allRelatedPermissions.filter(p => p.sourceFile === entity.sourceFile);
+  for (const p of entitiesInThisFile) {
+    const val = (p.structured as any)?.value || p.title;
+    toRemoveValues.add(val);
+  }
+
+  // Ensure we don't remove the wildcard itself if it was somehow in toRemove
+  toRemoveValues.delete(draft.toWildcard);
+
+  const nextAllow = allow.filter(v => !toRemoveValues.has(v));
+  if (!nextAllow.includes(draft.toWildcard)) {
+    nextAllow.push(draft.toWildcard);
+  }
+  
+  // Only update if something actually changed to avoid subtle JSON formatting noops
+  perms.allow = nextAllow.sort();
+
+  return serializeSettings({ ...parsed, raw });
+}
+
 function buildEnabledPlugins(entity: Entity, draft: EnabledPluginsDraft): string {
   const parsed = parseSettings(entity.rawContent);
   const raw = JSON.parse(JSON.stringify(parsed.raw)) as Record<string, unknown>;
@@ -268,8 +305,14 @@ export function buildNextContentFor(
     case "env":
       return buildEnv(entity, draft as EnvDraft);
     case "mcp-server":
+      if (typeof draft === "object" && draft !== null && (draft as any).kind === "consolidate-permissions") {
+        return buildMcpConsolidate(entity, draft as McpConsolidateDraft);
+      }
       return buildMcpServer(entity, draft as McpServerDraft);
     case "enabled-plugins":
+      if (typeof draft === "object" && draft !== null && (draft as any).kind === "consolidate-permissions") {
+        return buildMcpConsolidate(entity, draft as McpConsolidateDraft);
+      }
       return buildEnabledPlugins(entity, draft as EnabledPluginsDraft);
     case "keybinding":
       return buildKeybinding(draft as KeybindingDraft);

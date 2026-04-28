@@ -95,7 +95,7 @@ export function RightRail({
         sourceFile: api.sourceFile ?? entity.sourceFile,
         scopeRoot: api.scopeRoot ?? entity.scopeRoot,
         nextContent: api.getSerializedContent(),
-        expectedMtimeMs: entity.mtimeMs,
+        expectedMtimeMs: api.expectedMtimeMs ?? entity.mtimeMs,
       };
       const r = await fetch("/api/save/preview", {
         method: "POST",
@@ -129,7 +129,7 @@ export function RightRail({
           sourceFile,
           scopeRoot,
           nextContent: api.getSerializedContent(),
-          expectedMtimeMs: entity.mtimeMs,
+          expectedMtimeMs: api.expectedMtimeMs ?? entity.mtimeMs,
         }),
       });
       const j = await r.json();

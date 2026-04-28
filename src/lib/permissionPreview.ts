@@ -33,7 +33,7 @@ export function permissionPreviewColorClass(effect: PermissionEffect): string {
   }
 }
 
-const PERM_RE = /^(\w+)\s*(?:\(([^)]*)\))?$/;
+const PERM_RE = /^([^\s(]+)\s*(?:\(([^)]*)\))?$/;
 
 export function parsePermissionValue(
   value: string,

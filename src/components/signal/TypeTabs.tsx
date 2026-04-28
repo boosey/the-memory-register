@@ -59,6 +59,7 @@ export function TypeTabs({
 }: TypeTabsProps) {
   const countsByType = new Map<EntityType, number>();
   for (const e of entities) {
+    if (e.type === "enabled-plugins") continue;
     countsByType.set(e.type, (countsByType.get(e.type) ?? 0) + 1);
   }
   const relatedByType = computeRelatedByType(pinnedId, entities, relations);

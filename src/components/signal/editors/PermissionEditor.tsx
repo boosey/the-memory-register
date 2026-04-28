@@ -50,6 +50,11 @@ export function PermissionEditor({
   const preview = permissionPreview({ effect, tool, pattern });
   const effectColor = permissionPreviewColorClass(effect);
 
+  const options = useMemo(() => {
+    if (TOOL_OPTIONS.includes(tool as any)) return TOOL_OPTIONS;
+    return [...TOOL_OPTIONS, tool];
+  }, [tool]);
+
   const ruleValue = useMemo(() => formatPermissionValue(tool, pattern), [tool, pattern]);
 
   useEffect(() => {
@@ -71,7 +76,7 @@ export function PermissionEditor({
     <div>
       <FormRow label="Tool" hint="Which tool family this permission applies to.">
         <div className="flex flex-wrap gap-[6px]">
-          {TOOL_OPTIONS.map((t) => (
+          {options.map((t) => (
             <Chip
               key={t}
               label={t}

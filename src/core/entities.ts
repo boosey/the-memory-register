@@ -52,7 +52,6 @@ export const ENTITY_TYPE_ORDER: readonly EntityType[] = [
   "keybinding",
   "agent",
   "mcp-server",
-  "enabled-plugins",
 ] as const;
 
 // ── Provenance buckets ───────────────────────────────────────────────────────

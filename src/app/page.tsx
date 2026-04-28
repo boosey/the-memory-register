@@ -158,6 +158,7 @@ function Loaded({
 }) {
   const [activeType, setActiveType] = useState<EntityType>(() => {
     for (const t of ENTITY_TYPE_ORDER) {
+      if (t === "enabled-plugins") continue;
       if (graph.entities.some((e) => e.type === t)) return t;
     }
     return "standing-instruction";

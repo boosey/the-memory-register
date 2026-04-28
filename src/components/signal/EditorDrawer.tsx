@@ -43,15 +43,15 @@ export function EditorDrawer({
   onOpenEntity,
 }: EditorDrawerProps) {
   const [tab, setTab] = useState<TabKey>("edit");
-  const apiRef = useRef<EditorApi>({
+  const [api, setApi] = useState<EditorApi>({
     getSerializedContent: () => entity.rawContent,
   });
   const [currentTitle, setCurrentTitle] = useState<string>(entity.title);
   const [currentStanzas, setCurrentStanzas] = useState<string[]>([]);
 
-  const onApiReady = useCallback((api: EditorApi) => {
-    apiRef.current = api;
-    if (api.stanzas) setCurrentStanzas(api.stanzas);
+  const onApiReady = useCallback((newApi: EditorApi) => {
+    setApi(newApi);
+    if (newApi.stanzas) setCurrentStanzas(newApi.stanzas);
   }, []);
 
   const onTitleChange = useCallback((t: string) => {
@@ -60,7 +60,7 @@ export function EditorDrawer({
 
   const onStanzasChange = useCallback((s: string[]) => {
     setCurrentStanzas(s);
-    apiRef.current.stanzas = s;
+    setApi(prev => ({ ...prev, stanzas: s }));
   }, []);
 
   const typeLabel = TYPE_LABELS[entity.type].label;
@@ -113,7 +113,7 @@ export function EditorDrawer({
       case "agent":
         return <AgentEditor {...common} />;
       case "mcp-server":
-        return <McpServerEditor {...common} />;
+        return <McpServerEditor {...common} allEntities={allEntities} relations={relations} />;
       case "enabled-plugins":
         return <EnabledPluginsEditor {...common} />;
       default:
@@ -210,7 +210,7 @@ export function EditorDrawer({
       <RightRail
         entity={entity}
         currentFormTitle={currentTitle}
-        api={apiRef.current}
+        api={api}
         onSaved={() => {
           onSaved();
         }}

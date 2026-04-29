@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="640" viewBox="0 0 640 640">
+  <defs>
+    <filter id="blueGlow1" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="22"/>
+    </filter>
+    <filter id="blueGlow2" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+    <filter id="blueGlow3" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="4"/>
+    </filter>
+
+    <linearGradient id="copperHorizontal" x1="0" y1="526" x2="640" y2="526" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#cf876d" stop-opacity="0"/>
+      <stop offset="18%" stop-color="#cf876d" stop-opacity="0.95"/>
+      <stop offset="82%" stop-color="#cf876d" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#cf876d" stop-opacity="0"/>
+    </linearGradient>
+
+    <linearGradient id="copperVerticalMain" x1="527" y1="0" x2="527" y2="640" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#cf876d" stop-opacity="0"/>
+      <stop offset="18%" stop-color="#cf876d" stop-opacity="0.95"/>
+      <stop offset="82%" stop-color="#cf876d" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#cf876d" stop-opacity="0"/>
+    </linearGradient>
+
+    <linearGradient id="copperVerticalLeft" x1="464" y1="0" x2="464" y2="462" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#cf876d" stop-opacity="0"/>
+      <stop offset="16%" stop-color="#cf876d" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#cf876d" stop-opacity="0.95"/>
+    </linearGradient>
+
+    <g id="ring">
+      <circle cx="0" cy="0" r="53" fill="none" stroke="#1a1ef7" stroke-width="10" opacity="0.98"/>
+      <circle cx="0" cy="0" r="34" fill="none" stroke="#224b6d" stroke-width="10" opacity="0.98"/>
+    </g>
+  </defs>
+
+  <rect x="0" y="0" width="640" height="640" fill="#04090c"/>
+
+  <g>
+    <use href="#ring" x="113" y="117"/>
+    <use href="#ring" x="251" y="117"/>
+    <use href="#ring" x="389" y="117"/>
+    <use href="#ring" x="527" y="117"/>
+
+    <use href="#ring" x="113" y="253"/>
+    <use href="#ring" x="251" y="253"/>
+    <use href="#ring" x="389" y="253"/>
+    <use href="#ring" x="527" y="253"/>
+
+    <use href="#ring" x="113" y="389"/>
+    <use href="#ring" x="251" y="389"/>
+    <use href="#ring" x="389" y="389"/>
+    <use href="#ring" x="527" y="389"/>
+
+    <use href="#ring" x="113" y="526"/>
+    <use href="#ring" x="251" y="526"/>
+    <use href="#ring" x="389" y="526"/>
+  </g>
+
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="0" y1="526" x2="640" y2="526" stroke="url(#copperHorizontal)" stroke-width="3.2"/>
+    <line x1="527" y1="0" x2="527" y2="640" stroke="url(#copperVerticalMain)" stroke-width="3.0"/>
+    <line x1="464" y1="0" x2="464" y2="462" stroke="url(#copperVerticalLeft)" stroke-width="3.0"/>
+    <line x1="487.97" y1="487.25" x2="428.03" y2="427.75" stroke="#cf876d" stroke-width="3.0"/>
+  </g>
+
+  <g>
+    <circle cx="527" cy="526" r="88" fill="#005cff" opacity="0.22" filter="url(#blueGlow1)"/>
+    <circle cx="527" cy="526" r="72" fill="#1468ff" opacity="0.28" filter="url(#blueGlow2)"/>
+    <circle cx="527" cy="526" r="60" fill="#2376ff" opacity="0.35" filter="url(#blueGlow3)"/>
+    <circle cx="527" cy="526" r="55" fill="#67a4ff"/>
+  </g>
+</svg>

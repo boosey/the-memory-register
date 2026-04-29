@@ -9,11 +9,12 @@ export function Masthead() {
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-3">
           <Image
-            src="/app_icon_v2.png"
+            src="/app_icon_v4.svg"
             alt="The Memory Register Logo"
             width={32}
             height={32}
             className="rounded-md"
+            unoptimized
           />
           <span
             className="font-sans text-[26px] font-semibold leading-none text-[color:var(--ink)]"

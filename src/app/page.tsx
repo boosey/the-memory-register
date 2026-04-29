@@ -60,7 +60,8 @@ function SignalFlowPage() {
       <Shell>
         <div className="flex flex-1 flex-col items-center justify-center gap-4 p-12 text-[color:var(--text-muted)]">
           <Image
-            src="/app_icon_v2.png"
+            src="/app_icon_v4.svg"
+            unoptimized
             alt="The Memory Register Logo"
             width={64}
             height={64}
@@ -78,7 +79,8 @@ function SignalFlowPage() {
       <Shell>
         <div className="flex flex-1 flex-col items-center justify-center gap-4 p-12 text-[color:var(--semantic-error)]">
           <Image
-            src="/app_icon_v2.png"
+            src="/app_icon_v4.svg"
+            unoptimized
             alt="The Memory Register Logo"
             width={64}
             height={64}
@@ -96,7 +98,8 @@ function SignalFlowPage() {
       <Shell>
         <div className="flex flex-1 flex-col items-center justify-center gap-4 p-12 text-[color:var(--text-muted)]">
           <Image
-            src="/app_icon_v2.png"
+            src="/app_icon_v4.svg"
+            unoptimized
             alt="The Memory Register Logo"
             width={64}
             height={64}

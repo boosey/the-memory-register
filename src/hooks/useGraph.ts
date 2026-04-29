@@ -8,11 +8,13 @@ export function useGraph() {
   const [loading, setLoading] = useState(true);
   const [tick, setTick] = useState(0);
 
-  const refetch = useCallback(() => setTick((n) => n + 1), []);
+  const refetch = useCallback(() => {
+    setLoading(true);
+    setTick((n) => n + 1);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
-    if (tick === 0) setLoading(true);
     fetch("/api/graph", { cache: "no-store" })
       .then((r) => r.json())
       .then((g: GraphPayload) => {

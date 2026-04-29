@@ -52,7 +52,6 @@ function computeRelatedByType(
 export function TypeTabs({
   entities,
   relations,
-  pseudoNodes,
   activeType,
   pinnedId,
   onSelectType,
@@ -63,10 +62,6 @@ export function TypeTabs({
     countsByType.set(e.type, (countsByType.get(e.type) ?? 0) + 1);
   }
   const relatedByType = computeRelatedByType(pinnedId, entities, relations);
-
-  const slugs = (
-    pseudoNodes.filter((p) => p.kind === "slug") as any[]
-  ).sort((a, b) => a.name.localeCompare(b.name));
 
   return (
     <div

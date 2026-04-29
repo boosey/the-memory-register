@@ -8,7 +8,7 @@ import type {
   GhostSlug,
   SlugMetadata,
 } from "../types";
-import { resolveSlugToPath, slugToPath } from "./slugCodec";
+import { resolveSlugToPath } from "./slugCodec";
 
 export interface CrawlOptions {
   claudeHome: string;

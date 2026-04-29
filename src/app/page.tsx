@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { useMemo, useState } from "react";
 import {
   ENTITY_TYPE_ORDER,
@@ -13,7 +14,6 @@ import {
 import { Footer } from "@/components/signal/Footer";
 import { HealthRibbon } from "@/components/signal/HealthRibbon";
 import { Masthead } from "@/components/signal/Masthead";
-import { ProjectSelect } from "@/components/signal/ProjectSelect";
 import { SchematicHeader } from "@/components/signal/SchematicHeader";
 import { SignalRow } from "@/components/signal/SignalRow";
 import { TracingBanner } from "@/components/signal/TracingBanner";
@@ -58,8 +58,17 @@ function SignalFlowPage() {
   if (loading) {
     return (
       <Shell>
-        <div className="flex flex-1 items-center justify-center p-12 text-[color:var(--text-muted)]">
-          Loading…
+        <div className="flex flex-1 flex-col items-center justify-center gap-4 p-12 text-[color:var(--text-muted)]">
+          <Image
+            src="/app_icon_v2.png"
+            alt="The Memory Register Logo"
+            width={64}
+            height={64}
+            className="animate-pulse rounded-xl opacity-20 grayscale"
+          />
+          <div className="text-[13px] font-medium tracking-tight">
+            Scanning configuration…
+          </div>
         </div>
       </Shell>
     );
@@ -67,8 +76,17 @@ function SignalFlowPage() {
   if (error) {
     return (
       <Shell>
-        <div className="flex flex-1 items-center justify-center p-12 text-[color:var(--semantic-error)]">
-          Failed to load graph: {error}
+        <div className="flex flex-1 flex-col items-center justify-center gap-4 p-12 text-[color:var(--semantic-error)]">
+          <Image
+            src="/app_icon_v2.png"
+            alt="The Memory Register Logo"
+            width={64}
+            height={64}
+            className="rounded-xl opacity-20 grayscale"
+          />
+          <div className="text-[13px] font-medium tracking-tight">
+            Failed to load graph: {error}
+          </div>
         </div>
       </Shell>
     );
@@ -76,8 +94,15 @@ function SignalFlowPage() {
   if (!graph) {
     return (
       <Shell>
-        <div className="flex flex-1 items-center justify-center p-12 text-[color:var(--text-muted)]">
-          No data.
+        <div className="flex flex-1 flex-col items-center justify-center gap-4 p-12 text-[color:var(--text-muted)]">
+          <Image
+            src="/app_icon_v2.png"
+            alt="The Memory Register Logo"
+            width={64}
+            height={64}
+            className="rounded-xl opacity-20 grayscale"
+          />
+          <div className="text-[13px] font-medium tracking-tight">No data found.</div>
         </div>
       </Shell>
     );
@@ -130,7 +155,7 @@ function groupByFile(entities: readonly Entity[]): GroupedRow[] {
     else groups.set(key, [e]);
   }
   const rows: GroupedRow[] = [];
-  for (const [key, group] of groups) {
+  for (const [, group] of groups) {
     // When grouping by file, we don't collapse by identity; each entity
     // in the file gets its own row.
     for (const e of group) {
@@ -345,7 +370,6 @@ function Loaded({
       <TypeTabs
         entities={filteredEntities}
         relations={graph.relations}
-        pseudoNodes={graph.pseudoNodes}
         activeType={activeType}
         pinnedId={pinnedId}
         onSelectType={setActiveType}
@@ -454,7 +478,7 @@ function Loaded({
         <GhostSlugModal
           ghosts={graph.pseudoNodes.filter(
             (p) => p.kind === "slug" && p.isGhost,
-          ) as any[]}
+          ) as SlugPseudoNode[]}
           onClose={() => setManageGhostsOpen(false)}
           onRemoved={() => {
             setManageGhostsOpen(false);

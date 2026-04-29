@@ -8,7 +8,8 @@ export function useArtifact(id: string | null) {
 
   useEffect(() => {
     if (!id) {
-      setNode(null);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setNode((prev) => (prev === null ? prev : null));
       return;
     }
     let cancelled = false;

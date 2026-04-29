@@ -30,7 +30,7 @@ export function PluginEditor({
   allEntities = [],
   onOpenEntity,
 }: PluginEditorProps) {
-  const initial = (entity.structured ?? {}) as PluginShape;
+  const initial = useMemo(() => (entity.structured ?? {}) as PluginShape, [entity.structured]);
   const [name, setName] = useState(initial.name ?? entity.title);
   const [source, setSource] = useState(
     initial.source ?? (initial.raw?.repository as string) ?? "",

@@ -1,4 +1,4 @@
-import type { AuthorBucket, Entity } from "@/core/entities";
+import type { Entity } from "@/core/entities";
 import { WireSegment } from "./WireSegment";
 
 interface SignalNodeProps {
@@ -7,14 +7,7 @@ interface SignalNodeProps {
   isShadowed: boolean;
 }
 
-const AUTHOR_STRIPE: Record<AuthorBucket, string> = {
-  anthropic: "var(--author-anthropic)",
-  community: "var(--author-community)",
-  you: "var(--author-you)",
-  unknown: "var(--author-unknown)",
-};
-
-const AUTHOR_TINT: Record<AuthorBucket, string> = {
+const AUTHOR_TINT: Record<string, string> = {
   anthropic: "var(--author-anthropic-tint)",
   community: "var(--author-community-tint)",
   you: "var(--author-you-tint)",
@@ -25,7 +18,6 @@ export function SignalNode({ entities, isWinner, isShadowed }: SignalNodeProps) 
   // Use the first entity for coloring, but theoretically they should all share 
   // the same author if they are in the same scope/group.
   const first = entities[0]!;
-  const stripe = AUTHOR_STRIPE[first.author];
   const tint = AUTHOR_TINT[first.author];
   const count = entities.length;
 

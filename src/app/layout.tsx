@@ -19,6 +19,10 @@ const jetBrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "The Memory Register",
   description: "Local-only manager for Claude Code configuration.",
+  icons: {
+    icon: "/app_icon_v2.png",
+    apple: "/app_icon_v2.png",
+  },
 };
 
 export default function RootLayout({

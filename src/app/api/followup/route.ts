@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { NextResponse } from "next/server";
+import type { DetectionOccurrence } from "@/core/entities";
 
 export async function POST(req: Request) {
   try {
@@ -18,7 +19,7 @@ export async function POST(req: Request) {
 **Convention:** \`${convention}\`
 **Occurrences:** ${occurrences.length}
 **Example files:**
-${occurrences.slice(0, 5).map((o: any) => `- \`${o.sourceFile}\``).join("\n")}
+${occurrences.slice(0, 5).map((o: DetectionOccurrence) => `- \`${o.sourceFile}\``).join("\n")}
 
 **Proposed v2 fix:** [TBD]
 `;

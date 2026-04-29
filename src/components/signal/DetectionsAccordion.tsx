@@ -37,11 +37,9 @@ export function DetectionsAccordion({ detections }: DetectionsAccordionProps) {
       });
       const j = await res.json();
       if (!j.ok) {
-        // eslint-disable-next-line no-console
         console.error("Failed to open followup:", j.message);
       }
     } catch (e) {
-      // eslint-disable-next-line no-console
       console.error("Failed to open followup:", e);
     } finally {
       setPending(null);

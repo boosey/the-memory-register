@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import type { Entity, EntityType, Relation } from "@/core/entities";
 import { TYPE_LABELS } from "./typeLabels";
 import { RightRail } from "./editors/RightRail";

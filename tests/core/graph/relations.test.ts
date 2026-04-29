@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+import path from "node:path";
 import {
   deriveAccretesFrom,
   deriveFiresOn,
@@ -81,7 +82,6 @@ describe("deriveImports", () => {
   it("resolves known targets to entities; unknown paths to path pseudo-nodes", () => {
     // Use the same sourceFile for both entities so the byFile index is
     // populated regardless of platform path resolution.
-    const path = require("node:path");
     const srcFile = path.resolve("/abs/CLAUDE.md");
     const tgtFile = path.resolve("/abs/imp.md");
     const entities: Entity[] = [
@@ -108,7 +108,6 @@ describe("deriveImports", () => {
   });
 
   it("marks missing-file imports as broken and registers path pseudo-node", () => {
-    const path = require("node:path");
     const entities: Entity[] = [
       ent({
         id: "src",

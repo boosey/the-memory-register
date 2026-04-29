@@ -40,6 +40,7 @@ export function DiffPreviewModal({
   if (!open) return null;
   const close = ecBtnClass();
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleEditorMount = (editor: any) => {
     if (!stanzas || stanzas.length === 0) return;
 

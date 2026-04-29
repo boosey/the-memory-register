@@ -41,23 +41,6 @@ export function BrokenImportModal({
       // Implementation logic: read importer content, remove the line with the path, save.
       // This is complex to do purely on client if we want it perfect.
       // v1.8 simplified: we'll use a new bulk action or specialized endpoint if needed.
-      // Actually, we can just edit the entity's imports list if it's a standing-instruction.
-      if (importer.type === "standing-instruction" && importer.imports) {
-        const nextImports = importer.imports.filter(i => i !== path && i !== `@${path}`);
-        const r = await fetch("/api/save", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({
-            sourceFile: importer.sourceFile,
-            scopeRoot: importer.scopeRoot,
-            expectedMtimeMs: importer.mtimeMs,
-            // We need to re-serialize the whole file. 
-            // This is better done via a specialized resolver endpoint.
-          }),
-        });
-        // ...
-      }
-      
       // For now, let's assume we have an endpoint that handles this.
       const res = await fetch("/api/resolve-import", {
         method: "POST",

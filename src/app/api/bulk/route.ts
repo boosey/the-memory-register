@@ -3,6 +3,7 @@ import { z } from "zod";
 import { dispatchBulk } from "@/core/save/bulkOps";
 import { resolveHomePaths } from "@/core/paths";
 import { getOrBuildGraph, invalidate } from "@/lib/graphCache";
+import type { BulkRequest } from "@/core/apiContracts";
 
 const Schema = z.object({
   action: z.enum([
@@ -32,7 +33,7 @@ export async function POST(req: Request) {
   }
   const { backupsDir, claudeHome } = resolveHomePaths();
   const { payload } = await getOrBuildGraph();
-  const res = await dispatchBulk(parsed.data as any, {
+  const res = await dispatchBulk(parsed.data as BulkRequest, {
     backupsDir,
     claudeHome,
     knownEntities: payload.entities,

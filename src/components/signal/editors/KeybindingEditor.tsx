@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Entity } from "@/core/entities";
 import type { ParsedKeybindings } from "@/core/parsers/keybindings";
 import { buildNextContentFor } from "@/lib/buildNextContent";
@@ -46,8 +46,6 @@ export function KeybindingEditor({ entity, onApiReady }: TypedEditorProps) {
     initial.entries.map((e) => ({ chord: e.chord, action: e.action })),
   );
   const [capturingIdx, setCapturingIdx] = useState<number | null>(null);
-  const capturingRef = useRef<number | null>(null);
-  capturingRef.current = capturingIdx;
 
   useEffect(() => {
     const draft: ParsedKeybindings = {
@@ -79,7 +77,7 @@ export function KeybindingEditor({ entity, onApiReady }: TypedEditorProps) {
 
   function handleChordKeyDown(i: number) {
     return (e: React.KeyboardEvent<HTMLDivElement>) => {
-      if (capturingRef.current !== i) return;
+      if (capturingIdx !== i) return;
       e.preventDefault();
       const chord = formatChord(e);
       if (chord) {

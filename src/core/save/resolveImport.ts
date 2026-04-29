@@ -35,7 +35,7 @@ export async function resolveBrokenImport(
       case "remove":
         return await handleRemove(entity, req.path, ctx);
       case "create":
-        return await handleCreate(entity, req.path, ctx);
+        return await handleCreate(entity, req.path);
       case "update":
         return await handleUpdate(entity, req.path, req.newPath || "", ctx);
       default:
@@ -87,7 +87,6 @@ async function handleRemove(
 async function handleCreate(
   entity: Entity,
   targetPath: string,
-  _ctx: ResolveImportContext,
 ): Promise<ResolveImportResponse> {
   // Resolve the relative path to absolute
   const importerDir = path.dirname(entity.sourceFile);

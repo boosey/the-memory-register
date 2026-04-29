@@ -51,7 +51,7 @@ export function PermissionEditor({
   const effectColor = permissionPreviewColorClass(effect);
 
   const options = useMemo(() => {
-    if (TOOL_OPTIONS.includes(tool as any)) return TOOL_OPTIONS;
+    if (TOOL_OPTIONS.includes(tool as (typeof TOOL_OPTIONS)[number])) return TOOL_OPTIONS;
     return [...TOOL_OPTIONS, tool];
   }, [tool]);
 

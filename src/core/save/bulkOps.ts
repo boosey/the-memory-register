@@ -399,19 +399,26 @@ async function addEntityToTarget(
     } else {
       const parsed = parseSettings(content || "{}");
       if (entity.type === "permission") {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const sd = entity.structured as any;
         const group = sd?.group || "allow";
         const val = sd?.value || entity.title;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const perms = (parsed.raw.permissions ??= {}) as any;
         const list = (perms[group] ??= []) as string[];
         list.push(val);
       } else if (entity.type === "hook") {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const sd = entity.structured as any;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const hooks = (parsed.raw.hooks ??= {}) as any;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const list = (hooks[sd?.event || "PostToolUse"] ??= []) as any[];
         list.push({ matcher: sd?.matcher || "*", hooks: sd?.hooks || [] });
       } else if (entity.type === "env") {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const sd = entity.structured as any;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const env = (parsed.raw.env ??= {}) as any;
         env[sd?.name || entity.title] = sd?.value || entity.intent;
       } else {
@@ -741,6 +748,7 @@ async function deleteFileEntity(
  * Removes a nested property from an object using pseudo-JSON-pointer syntax
  * like "permissions.allow[0]" or "env.DEBUG".
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function deleteEntryFromSettings(obj: any, pathStr: string) {
   const parts = pathStr.split(".");
   let cur = obj;

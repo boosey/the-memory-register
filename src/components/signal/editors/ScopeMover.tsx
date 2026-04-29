@@ -27,7 +27,6 @@ export function ScopeMover({ entity, onMoved }: ScopeMoverProps) {
   const [error, setError] = useState<string | null>(null);
 
   const currentIndex = SCOPE_LADDER.indexOf(entity.scope);
-  const targetIndex = SCOPE_LADDER.indexOf(scope);
 
   function scopeToAction(target: Scope): BulkAction | null {
     const idx = SCOPE_LADDER.indexOf(target);
@@ -128,7 +127,7 @@ export function ScopeMover({ entity, onMoved }: ScopeMoverProps) {
           {isManualToAuto && (
             <p>
               Moving a <b>Manual Instruction</b> to the Slug scope will convert it into <b>Auto-Memory</b> in <code className="bg-[color:var(--paper)] px-1 rounded">MEMORY.md</code>. 
-              It will become part of the agent's self-managed context.
+              It will become part of the agent&apos;s self-managed context.
             </p>
           )}
         </div>

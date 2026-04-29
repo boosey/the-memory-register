@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { Entity, Relation } from "@/core/entities";
 import type { ParsedMcpServer } from "@/core/parsers/mcpServer";
 import { buildNextContentFor, type McpConsolidateDraft } from "@/lib/buildNextContent";
-import { FormRow, fieldClass, monoClass, ecBtnClass } from "./shared";
+import { FormRow, monoClass, ecBtnClass } from "./shared";
 import type { TypedEditorProps } from "./editorTypes";
 
 function structured(entity: Entity): ParsedMcpServer | null {
@@ -20,7 +20,6 @@ export function McpServerEditor({
   onApiReady,
   onTitleChange,
   allEntities = [],
-  relations = [],
 }: McpServerEditorProps) {
   const initial = useMemo(() => structured(entity), [entity]);
   const [name, setName] = useState(initial?.name || entity.title);
@@ -61,6 +60,7 @@ export function McpServerEditor({
 
     return allEntities.filter(e => {
       if (e.type !== 'permission') return false;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const val = (e.structured as any)?.value || e.title;
       return prefixes.some(p => val.startsWith(p));
     });
@@ -70,6 +70,7 @@ export function McpServerEditor({
     // If we found any plugin-prefixed permissions, use that specific prefix for the wildcard.
     if (entity.plugin) {
       const pluginPrefix = `mcp__plugin_${entity.plugin}_${name}__`;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if (relatedPermissions.some(p => ((p.structured as any)?.value || p.title).startsWith(pluginPrefix))) {
         return `${pluginPrefix}*`;
       }
@@ -81,6 +82,7 @@ export function McpServerEditor({
     // Can consolidate if there are multiple specific permissions
     // and none of them is already the wildcard we intend to create.
     const hasWildcard = relatedPermissions.some(p => 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       p.title === wildcard || (p.structured as any)?.value === wildcard
     );
     return relatedPermissions.length > 1 && !hasWildcard;
@@ -105,6 +107,7 @@ export function McpServerEditor({
           const draft: McpConsolidateDraft = {
             kind: "consolidate-permissions",
             toWildcard: wildcard,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             toRemoveValues: relatedPermissions.map(p => (p.structured as any)?.value || p.title),
             allRelatedPermissions: relatedPermissions
           };
@@ -244,6 +247,7 @@ export function McpServerEditor({
                 {relatedPermissions.map(p => (
                   <li key={p.id} className="flex items-center gap-2 font-mono text-[11px] text-[color:var(--text-muted)]">
                     <span className="shrink-0 opacity-50">·</span>
+                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                     <span className="flex-1 truncate">{(p.structured as any)?.value || p.title}</span>
                     <span className={[
                       "smallcaps shrink-0 rounded-sm px-1 py-0.5 text-[8.5px] tracking-[0.08em]",

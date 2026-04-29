@@ -106,7 +106,7 @@ export function HealthRibbon({
   const totalIssues = chips.reduce((n, c) => n + c.count, 0);
 
   const slugs = (
-    graph.pseudoNodes.filter((p) => p.kind === "slug") as any[]
+    graph.pseudoNodes.filter((p) => p.kind === "slug") as SlugPseudoNode[]
   ).sort((a, b) => a.name.localeCompare(b.name));
 
   return (

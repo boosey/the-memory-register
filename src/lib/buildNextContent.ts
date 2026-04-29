@@ -32,7 +32,6 @@ import {
 } from "@/core/parsers/memory";
 import {
   serializeKeybindings,
-  type ParsedKeybindings,
 } from "@/core/parsers/keybindings";
 import type { Entity, EntityType } from "@/core/entities";
 
@@ -220,6 +219,7 @@ function buildMcpServer(entity: Entity, draft: McpServerDraft): string {
 
 function buildMcpConsolidate(entity: Entity, draft: McpConsolidateDraft): string {
   const parsed = parseSettings(entity.rawContent);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const raw = JSON.parse(JSON.stringify(parsed.raw)) as Record<string, any>;
   const perms = (raw.permissions ??= {});
   const allow = (perms.allow ??= []) as string[];
@@ -230,6 +230,7 @@ function buildMcpConsolidate(entity: Entity, draft: McpConsolidateDraft): string
   // Also identify permissions that specifically belong to this file (sourceFile match)
   const entitiesInThisFile = draft.allRelatedPermissions.filter(p => p.sourceFile === entity.sourceFile);
   for (const p of entitiesInThisFile) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const val = (p.structured as any)?.value || p.title;
     toRemoveValues.add(val);
   }
@@ -305,11 +306,13 @@ export function buildNextContentFor(
     case "env":
       return buildEnv(entity, draft as EnvDraft);
     case "mcp-server":
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if (typeof draft === "object" && draft !== null && (draft as any).kind === "consolidate-permissions") {
         return buildMcpConsolidate(entity, draft as McpConsolidateDraft);
       }
       return buildMcpServer(entity, draft as McpServerDraft);
     case "enabled-plugins":
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if (typeof draft === "object" && draft !== null && (draft as any).kind === "consolidate-permissions") {
         return buildMcpConsolidate(entity, draft as McpConsolidateDraft);
       }
@@ -331,6 +334,7 @@ export function buildNextContentFor(
         typeof draft === "object" &&
         draft !== null &&
         "pluginName" in draft &&
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         "targetSettings" in (draft as any)
       ) {
         const d = draft as PluginToggleDraft & { targetSettings: Entity };

@@ -117,7 +117,7 @@ export function parseSettings(src: string): ParsedSettings {
     kind: "enabled-plugins",
     entryKey: "enabledPlugins",
     plugins: (Array.isArray(enabledPlugins) || (enabledPlugins && typeof enabledPlugins === "object"))
-      ? (enabledPlugins as any)
+      ? (enabledPlugins as string[] | Record<string, boolean>)
       : [],
   });
 

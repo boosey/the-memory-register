@@ -1,6 +1,6 @@
-# memmgmt v1 — Claude Code Build Prompt
+# the-memory-register v1 — Claude Code Build Prompt
 
-**How to use this file:** Paste everything between the `=== BEGIN PROMPT ===` and `=== END PROMPT ===` markers into a fresh Claude Code session opened inside `C:\Users\boose\projects\memmgmt`. Claude Code will then execute the build autonomously until the success criteria are met, asking for input only in the specific situations enumerated in §6.
+**How to use this file:** Paste everything between the `=== BEGIN PROMPT ===` and `=== END PROMPT ===` markers into a fresh Claude Code session opened inside `C:\Users\boose\projects\the-memory-register`. Claude Code will then execute the build autonomously until the success criteria are met, asking for input only in the specific situations enumerated in §6.
 
 Before pasting: make sure the session has permission to install npm packages, run `pnpm`/`pnpm dlx`, write files under the project directory, and run git commits. The prompt does not require any network beyond npm registry access and the `open` package's browser launch.
 
@@ -10,14 +10,14 @@ Before pasting: make sure the session has permission to install npm packages, ru
 
 # Mission
 
-You are building **memmgmt v1** — a local-only Next.js web app that gives a Claude Code power user a visual, scope-aware UX for managing the entire Claude Code configuration surface (CLAUDE.md, skills, slash commands, settings.json, hooks, keybindings, and auto-memory) across Global / Slug / Plugin / Project / Local scopes, with diff-preview saves, timestamped backups, and one-click undo.
+You are building **the-memory-register v1** — a local-only Next.js web app that gives a Claude Code power user a visual, scope-aware UX for managing the entire Claude Code configuration surface (CLAUDE.md, skills, slash commands, settings.json, hooks, keybindings, and auto-memory) across Global / Slug / Plugin / Project / Local scopes, with diff-preview saves, timestamped backups, and one-click undo.
 
 Your job is to execute the pre-existing implementation plan end-to-end and stop only when the v1 success criteria pass. The design and plan are already approved; do not re-litigate them. Your value is implementation fidelity and verification discipline, not redesign.
 
 ## 1. Authoritative sources of truth (read these first, in this order)
 
-1. **Design / PRD:** `docs/superpowers/specs/2026-04-22-memmgmt-design.md` — the *what* and *why*. Section references throughout the plan (e.g., §5.6.2) point here.
-2. **Implementation plan:** `docs/superpowers/plans/2026-04-22-memmgmt-v1.md` — the *how*, as a sequence of 10 milestones, each with concrete tasks and TDD steps (code + commands + commit instructions). This is the operating manual; follow it task-by-task.
+1. **Design / PRD:** `docs/superpowers/specs/2026-04-22-the-memory-register-design.md` — the *what* and *why*. Section references throughout the plan (e.g., §5.6.2) point here.
+2. **Implementation plan:** `docs/superpowers/plans/2026-04-22-the-memory-register-v1.md` — the *how*, as a sequence of 10 milestones, each with concrete tasks and TDD steps (code + commands + commit instructions). This is the operating manual; follow it task-by-task.
 
 Read both files fully before writing any code. Do not skim. The design document includes an explicit non-goals list (§6) and a core tenet (§2) that must constrain every implementation choice.
 
@@ -76,7 +76,7 @@ After completing all tasks in a milestone, run the milestone-level verification 
 
 You are done when **all five** of these pass. These come from the design document §12 verbatim:
 
-1. From a cold `pnpm build && pnpm memmgmt:launch-dev`, every artifact across every scope is rendered in under 10 seconds of crawl time.
+1. From a cold `pnpm build && pnpm the-memory-register:launch-dev`, every artifact across every scope is rendered in under 10 seconds of crawl time.
 2. For any artifact, the user can see its scope, content, and override status in ≤2 clicks.
 3. The user can edit any artifact in one of the three kinds supported in M9 (CLAUDE.md section body, settings permission/env entries, skill frontmatter), preview the diff, save, and undo — without leaving the app.
 4. Given a CLAUDE.md file that uses `@path/to/file` imports, the user can answer "what does it import and where does each imported file live" without reading any markdown.
@@ -99,7 +99,7 @@ Also run the manual smoke checklist in the plan's Milestone 10, Task 10.5 and fi
 
 1. Read the design document end to end.
 2. Read the plan document end to end.
-3. Confirm the working directory (`C:\Users\boose\projects\memmgmt`) contains only the two docs committed so far; do not delete anything you find.
+3. Confirm the working directory (`C:\Users\boose\projects\the-memory-register`) contains only the two docs committed so far; do not delete anything you find.
 4. Begin **Milestone 0 Task 0.1** and proceed linearly.
 5. After each milestone's final commit, run:
 
@@ -169,13 +169,13 @@ Do not dump generated code into the chat; the code lives in files and in git.
 
 ## 9. Non-obvious pitfalls (read once; internalize)
 
-- **Next.js 15 App Router + `output: 'standalone'`** produces `.next/standalone/server.js` that expects `PORT` and `HOSTNAME` env vars. The `bin/memmgmt.mjs` launcher sets these before `import()`ing the server. Don't bypass this dance.
+- **Next.js 15 App Router + `output: 'standalone'`** produces `.next/standalone/server.js` that expects `PORT` and `HOSTNAME` env vars. The `bin/the-memory-register.mjs` launcher sets these before `import()`ing the server. Don't bypass this dance.
 - **`reactflow` vs `@xyflow/react`**: the ecosystem is mid-migration. If `reactflow` install fails or types are broken, switch to `@xyflow/react` and adjust imports in `src/components/GraphView.tsx`. The rest of the app is unaffected.
 - **Slug codec edge cases**: the algorithm in `src/core/discovery/slugCodec.ts` is pragmatic and may not handle every Windows UNC path or symlinked project. If a real-world slug fails to decode, extend the codec with a test case and fix; do not hand-write exceptions in the crawler.
 - **Monaco in Next.js App Router**: `@monaco-editor/react` works but requires `"use client"` on any component using it. Don't try to SSR Monaco.
 - **Concurrent-edit check**: the mtime comparison uses a ±1ms tolerance. Some filesystems report coarser mtimes; if concurrent-edit false-positives appear in manual testing, expand the tolerance to `1000ms` and add a comment explaining why.
 - **File writes via `fs.writeFile(path, content, "utf8")`** — always specify `utf8` explicitly. Default encoding varies by Node version and has caused silent corruption in similar tools.
-- **The auto-memory system** (see design §1 Slug scope bullet) is your own test bed. Point memmgmt at `~/.claude/` on whichever machine you run it on and the user's real memory files will appear. This is the fastest smoke test.
+- **The auto-memory system** (see design §1 Slug scope bullet) is your own test bed. Point the-memory-register at `~/.claude/` on whichever machine you run it on and the user's real memory files will appear. This is the fastest smoke test.
 
 ## 10. Scope of autonomy
 
@@ -188,9 +188,9 @@ Do not dump generated code into the chat; the code lives in files and in git.
 
 ## 11. What "done" looks like (final state)
 
-- `pnpm pack` produces a tarball containing `.next/standalone`, `.next/static`, `public`, `bin/memmgmt.mjs`, `package.json`, `README.md`.
-- `pnpm memmgmt:launch-dev` (post-build) opens a browser on a free port in the 5174–5199 range and renders the populated inventory view within 10 seconds.
-- A user can click any CLAUDE.md section, settings permission rule, or skill card, edit a supported field, preview the diff, save, confirm a file appeared under `~/.claude/memmgmt-backups/<iso>/`, and click Undo to restore.
+- `pnpm pack` produces a tarball containing `.next/standalone`, `.next/static`, `public`, `bin/the-memory-register.mjs`, `package.json`, `README.md`.
+- `pnpm the-memory-register:launch-dev` (post-build) opens a browser on a free port in the 5174–5199 range and renders the populated inventory view within 10 seconds.
+- A user can click any CLAUDE.md section, settings permission rule, or skill card, edit a supported field, preview the diff, save, confirm a file appeared under `~/.claude/the-memory-register-backups/<iso>/`, and click Undo to restore.
 - `pnpm test` reports all green. `pnpm typecheck` reports zero errors.
 - Git history is a clean linear sequence of commits matching the plan's task structure.
 - `docs/superpowers/followups.md` exists and lists any v2 candidates you spotted (empty if none).

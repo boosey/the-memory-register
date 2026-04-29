@@ -10,7 +10,7 @@ let src: string;
 let backupsDir: string;
 
 beforeEach(async () => {
-  tmp = await fs.mkdtemp(path.join(os.tmpdir(), "memmgmt-w-"));
+  tmp = await fs.mkdtemp(path.join(os.tmpdir(), "the-memory-register-w-"));
   src = path.join(tmp, "CLAUDE.md");
   await fs.writeFile(src, "old\n", "utf8");
   backupsDir = path.join(tmp, "backups");

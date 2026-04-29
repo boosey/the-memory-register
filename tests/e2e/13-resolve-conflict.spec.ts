@@ -9,7 +9,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 
 const FIXTURE = path.resolve(process.cwd(), "tests/fixtures/sample-claude-home");
-const BACKUPS = path.join(FIXTURE, "memmgmt-backups");
+const BACKUPS = path.join(FIXTURE, "the-memory-register-backups");
 
 const CONTESTED = "conflict-skill";
 const GLOBAL_SKILL_DIR = path.join(FIXTURE, "skills", CONTESTED);

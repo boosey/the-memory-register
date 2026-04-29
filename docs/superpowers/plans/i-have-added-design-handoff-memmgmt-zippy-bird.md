@@ -1,8 +1,8 @@
-# memmgmt v1.6 + v1.7 — Implement new UX from `design_handoff_memmgmt/`
+# the-memory-register v1.6 + v1.7 — Implement new UX from `design_handoff_the-memory-register/`
 
 ## Context
 
-The shipped v1 UI (scope columns of stacked cards + a right-side structured editor) is "unusable" per the user. A new high-fidelity prototype has landed at `C:\Users\boose\projects\memmgmt\design_handoff_memmgmt\` — a row-per-entity signal-flow layout with scope lanes, tournament-bracket connectors, 9 type-dispatched inline editors, bulk actions, a health ribbon, and an editorial oklch token system.
+The shipped v1 UI (scope columns of stacked cards + a right-side structured editor) is "unusable" per the user. A new high-fidelity prototype has landed at `C:\Users\boose\projects\the-memory-register\design_handoff_the-memory-register\` — a row-per-entity signal-flow layout with scope lanes, tournament-bracket connectors, 9 type-dispatched inline editors, bulk actions, a health ribbon, and an editorial oklch token system.
 
 Delivering this is **not** a UX swap — it's v2 + part of v3 on the v1 PRD's roadmap. It requires:
 
@@ -235,4 +235,4 @@ Agent + mcp-server get **read-only rows + raw-Monaco edit fallback in both v1.6 
 - `src/app/api/graph/route.ts` *(rewrite)* — the one API contract that changes shape.
 - `src/components/signal/SignalRow.tsx` *(new)* — the workhorse component; 80% of the visual identity lives here.
 - `src/app/globals.css` *(rewrite)* — palette + typography replacement; affects every downstream component.
-- `design_handoff_memmgmt/variation-c.jsx`, `editors-by-type.jsx`, `shared.jsx` — visual + interaction contract; reference constantly; do not copy inline styles (port to Tailwind + CSS-vars).
+- `design_handoff_the-memory-register/variation-c.jsx`, `editors-by-type.jsx`, `shared.jsx` — visual + interaction contract; reference constantly; do not copy inline styles (port to Tailwind + CSS-vars).

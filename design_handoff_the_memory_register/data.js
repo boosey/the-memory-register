@@ -1,4 +1,4 @@
-// Shared mock data for memmgmt design exploration.
+// Shared mock data for the-memory-register design exploration.
 // Represents a plausible Claude Code life: 4 projects, some plugins,
 // some global memory, a couple ghosts, a couple dead imports.
 
@@ -37,7 +37,7 @@ window.MEM_DATA = (function () {
 
   // Projects the user works in (decoded from ~/.claude/projects/<slug>/).
   const PROJECTS = [
-    { slug: 'memmgmt',      path: '~/code/memmgmt',       active: true,  sessions: 47, lastActive: '2d ago',  turns: 1284 },
+    { slug: 'the-memory-register',      path: '~/code/the-memory-register',       active: true,  sessions: 47, lastActive: '2d ago',  turns: 1284 },
     { slug: 'claude-docs',  path: '~/code/claude-docs',   active: true,  sessions: 12, lastActive: '5d ago',  turns: 318 },
     { slug: 'api-gateway',  path: '~/work/api-gateway',   active: true,  sessions: 8,  lastActive: '3w ago',  turns: 142 },
     { slug: 'pilot-2024',   path: '~/archive/pilot-2024', active: false, sessions: 3,  lastActive: '4mo ago', turns: 47,  ghost: true },
@@ -81,10 +81,10 @@ window.MEM_DATA = (function () {
     { id:'g-env-timeout',    type:'env',     scope:'global',  author:'you',       title:'MCP_TIMEOUT',           intent:'30000',                                                 identity:'env:MCP_TIMEOUT' },
 
     // ── Memory (slug)
-    { id:'s-mem-user-tone',  type:'memory',  scope:'slug',    author:'you',       title:'user_tone.md',          intent:'User prefers short direct answers, no preamble.',      identity:'mem:user_tone', slugRef:'memmgmt' },
-    { id:'s-mem-feedback-1', type:'memory',  scope:'slug',    author:'you',       title:'feedback_no_emoji.md',  intent:'Corrected 4× for using emoji in code comments.',       identity:'mem:feedback_no_emoji', slugRef:'memmgmt' },
-    { id:'s-mem-project-stack',type:'memory',scope:'slug',    author:'you',       title:'project_stack.md',      intent:'Project uses Drizzle ORM, not Prisma.',                identity:'mem:project_stack', slugRef:'memmgmt' },
-    { id:'s-mem-ref-schema', type:'memory',  scope:'slug',    author:'you',       title:'reference_schema.md',   intent:'Indexed copy of the DB schema, stale 2w.',             identity:'mem:reference_schema', slugRef:'memmgmt', stale:true },
+    { id:'s-mem-user-tone',  type:'memory',  scope:'slug',    author:'you',       title:'user_tone.md',          intent:'User prefers short direct answers, no preamble.',      identity:'mem:user_tone', slugRef:'the-memory-register' },
+    { id:'s-mem-feedback-1', type:'memory',  scope:'slug',    author:'you',       title:'feedback_no_emoji.md',  intent:'Corrected 4× for using emoji in code comments.',       identity:'mem:feedback_no_emoji', slugRef:'the-memory-register' },
+    { id:'s-mem-project-stack',type:'memory',scope:'slug',    author:'you',       title:'project_stack.md',      intent:'Project uses Drizzle ORM, not Prisma.',                identity:'mem:project_stack', slugRef:'the-memory-register' },
+    { id:'s-mem-ref-schema', type:'memory',  scope:'slug',    author:'you',       title:'reference_schema.md',   intent:'Indexed copy of the DB schema, stale 2w.',             identity:'mem:reference_schema', slugRef:'the-memory-register', stale:true },
 
     // ── Slash commands
     { id:'g-cmd-ship',       type:'command', scope:'global',  author:'you',       title:'/ship',                  intent:'Create PR with conventional-commit title + changelog.',identity:'cmd:ship' },
@@ -127,10 +127,10 @@ window.MEM_DATA = (function () {
     { from:'p-claude-stack',  to:'@./missing-notes.md', kind:'imports', broken:true },
 
     // Memories accrete from sessions
-    { from:'s-mem-user-tone',    to:'slug:memmgmt', kind:'accretes-from', note:'47 sessions' },
-    { from:'s-mem-feedback-1',   to:'slug:memmgmt', kind:'accretes-from', note:'4 corrections' },
-    { from:'s-mem-project-stack',to:'slug:memmgmt', kind:'accretes-from', note:'12 sessions' },
-    { from:'s-mem-ref-schema',   to:'slug:memmgmt', kind:'accretes-from', note:'stale 14d' },
+    { from:'s-mem-user-tone',    to:'slug:the-memory-register', kind:'accretes-from', note:'47 sessions' },
+    { from:'s-mem-feedback-1',   to:'slug:the-memory-register', kind:'accretes-from', note:'4 corrections' },
+    { from:'s-mem-project-stack',to:'slug:the-memory-register', kind:'accretes-from', note:'12 sessions' },
+    { from:'s-mem-ref-schema',   to:'slug:the-memory-register', kind:'accretes-from', note:'stale 14d' },
   ];
 
   const REL_KINDS = {

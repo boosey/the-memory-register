@@ -10,7 +10,7 @@ import path from "node:path";
 
 const FIXTURE = path.resolve(process.cwd(), "tests/fixtures/sample-claude-home");
 const SKILL_FILE = path.join(FIXTURE, "skills", "demo-skill", "SKILL.md");
-const BACKUPS = path.join(FIXTURE, "memmgmt-backups");
+const BACKUPS = path.join(FIXTURE, "the-memory-register-backups");
 
 test("skill edit → preview diff → save with backup → undo restores", async ({
   page,

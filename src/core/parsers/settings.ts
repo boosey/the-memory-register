@@ -32,7 +32,7 @@ export interface ParsedSettings {
 
 const PERMISSION_GROUPS = ["allow", "deny", "ask"] as const;
 
-// Top-level keys memmgmt recognizes in settings.json. Anything else is
+// Top-level keys the-memory-register recognizes in settings.json. Anything else is
 // surfaced via `unknownTopLevelKeys` for the detections accordion.
 const KNOWN_TOP_LEVEL_KEYS = new Set([
   "permissions",

@@ -6,7 +6,7 @@ function ent(partial: Partial<Entity>): Entity {
   return {
     id: "x",
     type: "skill",
-    scope: "plugin",
+    scope: "global",
     author: "unknown",
     title: "",
     intent: "",
@@ -20,15 +20,16 @@ function ent(partial: Partial<Entity>): Entity {
 
 describe("shouldWarn", () => {
   it("true for plugin-scope entity with unknown author", () => {
-    expect(shouldWarn(ent({ author: "unknown", scope: "plugin" }))).toBe(true);
+    expect(shouldWarn(ent({ author: "unknown", plugin: "some-plugin" }))).toBe(true);
   });
 
   it("false when scope is not plugin", () => {
-    expect(shouldWarn(ent({ author: "unknown", scope: "project" }))).toBe(false);
+    // In v1.7+, 'plugin' is not a scope; shouldWarn checks the 'plugin' property.
+    expect(shouldWarn(ent({ author: "unknown", plugin: undefined }))).toBe(false);
   });
 
   it("false when author is not unknown", () => {
-    expect(shouldWarn(ent({ author: "community", scope: "plugin" }))).toBe(
+    expect(shouldWarn(ent({ author: "community", plugin: "some-plugin" }))).toBe(
       false,
     );
   });

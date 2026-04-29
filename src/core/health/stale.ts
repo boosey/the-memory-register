@@ -13,7 +13,7 @@ export interface DismissedMarker {
  *
  * Only applies to entities with type === 'memory' and a slugRef.
  *
- * Accepts an optional `dismissed` list (read from ~/.claude/memmgmt-state.json
+ * Accepts an optional `dismissed` list (read from ~/.claude/the-memory-register-state.json
  * by callers that care about the user's dismissals). If an entity has a
  * dismissal whose `atMs` is newer than the memory's mtimeMs, the staleness
  * is suppressed — it was already acknowledged. A newer mtime (user edited

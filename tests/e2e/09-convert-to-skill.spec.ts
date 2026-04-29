@@ -11,7 +11,7 @@ import path from "node:path";
 const FIXTURE = path.resolve(process.cwd(), "tests/fixtures/sample-claude-home");
 const COMMANDS_DIR = path.join(FIXTURE, "commands");
 const SKILLS_DIR = path.join(FIXTURE, "skills");
-const BACKUPS = path.join(FIXTURE, "memmgmt-backups");
+const BACKUPS = path.join(FIXTURE, "the-memory-register-backups");
 
 const THROWAWAY_CMD_NAME = "throwaway-cmd";
 const THROWAWAY_CMD_FILE = path.join(

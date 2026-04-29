@@ -1,4 +1,4 @@
-# memmgmt — Design & PRD (v1)
+# the-memory-register — Design & PRD (v1)
 
 **Date:** 2026-04-22
 **Status:** Approved (brainstorming phase)
@@ -34,9 +34,9 @@ Every view answers *"what does this mean / where does it apply / what overrides 
 
 ## 3. Product
 
-**Name:** `memmgmt`
+**Name:** `the-memory-register`
 **Form:** Local-only web app. Runs on the user's machine. No cloud, no auth, no service dependencies.
-**Invocation:** `npx memmgmt` or `bunx memmgmt` — starts a local Next.js server on an ephemeral port and opens the default browser automatically. Ctrl-C exits.
+**Invocation:** `npx the-memory-register` or `bunx the-memory-register` — starts a local Next.js server on an ephemeral port and opens the default browser automatically. Ctrl-C exits.
 **Target user:** Claude Code power users managing 5+ projects with non-trivial per-project configuration.
 
 ## 4. Staging (Roadmap)
@@ -59,7 +59,7 @@ Every view answers *"what does this mean / where does it apply / what overrides 
 - **Styling:** Tailwind CSS + shadcn/ui
 - **Graph:** React Flow
 - **Code/markdown editor (escape hatch):** Monaco
-- **Distribution:** npm package, invoked via `npx memmgmt` / `bunx memmgmt`
+- **Distribution:** npm package, invoked via `npx the-memory-register` / `bunx the-memory-register`
 
 ### 5.2 Primary View — Hybrid
 
@@ -123,7 +123,7 @@ Four edge types:
 4. **Plugin** (`~/.claude/plugins/.../`) — installed plugins.
 5. **Global** (`~/.claude/*`) — user defaults, lowest.
 
-For `CLAUDE.md` content merges, Claude Code itself concatenates rather than overrides; memmgmt reflects this by rendering a "merge" relationship for CLAUDE.md sections at different scopes *rather than* an override, **unless** the same heading exists at a higher scope — which is treated as override (later-scope heading wins for entries within it).
+For `CLAUDE.md` content merges, Claude Code itself concatenates rather than overrides; the-memory-register reflects this by rendering a "merge" relationship for CLAUDE.md sections at different scopes *rather than* an override, **unless** the same heading exists at a higher scope — which is treated as override (later-scope heading wins for entries within it).
 
 ### 5.5 Side Panel Editor
 
@@ -137,7 +137,7 @@ Every editor submits through the save pipeline (§5.8).
 
 ### 5.6 Discovery
 
-**Slug-reverse from `~/.claude/projects/<slug>/`.** Claude Code already maintains a directory per project it has interacted with; those slugs decode back to project paths (e.g., `C--Users-boose-projects-memmgmt` ↔ `C:\Users\boose\projects\memmgmt`).
+**Slug-reverse from `~/.claude/projects/<slug>/`.** Claude Code already maintains a directory per project it has interacted with; those slugs decode back to project paths (e.g., `C--Users-boose-projects-the-memory-register` ↔ `C:\Users\boose\projects\the-memory-register`).
 
 Discovery algorithm:
 
@@ -215,7 +215,7 @@ Transcripts are **not** nodes in v1. They are source material for v4 (The Hygien
 Every save passes through this pipeline:
 
 1. **Diff preview screen.** User sees before/after of the affected file, with changed regions highlighted.
-2. **Timestamped backup.** Before the file is overwritten, the original is copied to `~/.claude/memmgmt-backups/<YYYY-MM-DDTHH-MM-SS>/<relative/path>`.
+2. **Timestamped backup.** Before the file is overwritten, the original is copied to `~/.claude/the-memory-register-backups/<YYYY-MM-DDTHH-MM-SS>/<relative/path>`.
 3. **Save.**
 4. **Undo button** appears briefly in a toast and permanently in the artifact's side panel. Undo restores from the most recent backup for that file.
 
@@ -225,11 +225,11 @@ No git integration, no fancy history — just "oh shit" insurance that covers th
 
 **None.** The filesystem is the source of truth. Every page load re-crawls and re-parses, with results cached in memory for the session only.
 
-The only app-owned state is **view preferences** (active tab, filter selections, sidebar width), stored in `~/.claude/memmgmt-settings.json`. If crawl performance ever degrades past a few hundred milliseconds, a crawl-result cache file can be added; v1 does not include one.
+The only app-owned state is **view preferences** (active tab, filter selections, sidebar width), stored in `~/.claude/the-memory-register-settings.json`. If crawl performance ever degrades past a few hundred milliseconds, a crawl-result cache file can be added; v1 does not include one.
 
 ### 5.10 Launch
 
-`npx memmgmt` (or `bunx memmgmt`):
+`npx the-memory-register` (or `bunx the-memory-register`):
 
 1. Starts Next.js on an ephemeral localhost port (tries 5174, 5175, 5176… until one is free).
 2. Opens the default browser to that URL.
@@ -317,7 +317,7 @@ The core library is pure TS with no Next.js dependencies, so it can be unit-test
 - **Missing imports:** `@path/to/file` pointing to a non-existent file becomes a **dead-import** edge, rendered in red with a "broken" indicator.
 - **Dead slugs:** project path no longer exists → slug listed under "Ghost slugs" with a one-click "Remove this slug directory" action (with backup).
 - **FS permission errors:** artifact shown with a lock icon and the specific error; edit actions disabled for that artifact.
-- **Port conflict on launch:** fail fast with a clear message listing attempted ports; suggest `PORT=xxxx npx memmgmt`.
+- **Port conflict on launch:** fail fast with a clear message listing attempted ports; suggest `PORT=xxxx npx the-memory-register`.
 - **Concurrent edits:** if a file's mtime changed between load and save, the save is blocked with a clear "file changed on disk; reload?" prompt.
 
 ## 11. Testing
@@ -325,7 +325,7 @@ The core library is pure TS with no Next.js dependencies, so it can be unit-test
 - **Unit tests:** parsers (parse → serialize round-trip), graph builder (override detection, import resolution, edge generation), crawler (mocked filesystem).
 - **Integration tests:** end-to-end load against a fixture `.claude/` tree with representative artifacts across all scopes.
 - **Manual smoke test checklist** for v1 sign-off:
-  - Launch: `npx memmgmt` opens browser, crawl completes in <10s on a tree with ≥20 projects.
+  - Launch: `npx the-memory-register` opens browser, crawl completes in <10s on a tree with ≥20 projects.
   - Inventory view: every scope column populated with expected artifact counts.
   - Graph view: every `@import` in a test fixture is rendered as an edge.
   - Override detection: a project-level CLAUDE.md override of a global section is detected and visualized.
@@ -335,7 +335,7 @@ The core library is pure TS with no Next.js dependencies, so it can be unit-test
 
 ## 12. Success Criteria
 
-1. From a cold `npx memmgmt`, every artifact across every scope is rendered in under 10 seconds of crawl time.
+1. From a cold `npx the-memory-register`, every artifact across every scope is rendered in under 10 seconds of crawl time.
 2. For any artifact, the user can see its scope, content, and override status in ≤2 clicks.
 3. The user can edit any artifact (structured form preferred, Monaco escape hatch available), preview the diff, save, and undo — without leaving the app.
 4. The user can answer "what does this CLAUDE.md import and where does each imported file live" without reading any markdown.

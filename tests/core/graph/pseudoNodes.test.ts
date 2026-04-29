@@ -15,14 +15,14 @@ describe("PseudoNodeRegistry", () => {
   it("registers slugs idempotently with latest metadata winning", () => {
     const r = new PseudoNodeRegistry();
     r.registerSlug({
-      name: "memmgmt",
+      name: "the-memory-register",
       projectPath: "/a",
       sessionCount: 3,
       lastActiveMs: 100,
       isGhost: false,
     });
     r.registerSlug({
-      name: "memmgmt",
+      name: "the-memory-register",
       projectPath: "/b",
       sessionCount: 7,
       lastActiveMs: 200,
@@ -31,7 +31,7 @@ describe("PseudoNodeRegistry", () => {
     const slugs = r.flush().filter((p) => p.kind === "slug");
     expect(slugs).toHaveLength(1);
     expect(slugs[0]).toMatchObject({
-      id: "slug:memmgmt",
+      id: "slug:the-memory-register",
       projectPath: "/b",
       sessionCount: 7,
     });

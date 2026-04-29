@@ -12,7 +12,7 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
-    "design_handoff_memmgmt/**",
+    "design_handoff_the_memory_register/**",
   ]),
 ]);
 

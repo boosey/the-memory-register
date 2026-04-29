@@ -10,7 +10,7 @@ import type {
 } from "../apiContracts";
 
 export interface ConvertContext {
-  /** Root for persistent backups. Falls back to `<homeDir>/.claude/memmgmt-backups` via the route. */
+  /** Root for persistent backups. Falls back to `<homeDir>/.claude/the-memory-register-backups` via the route. */
   backupsDir: string;
   /** Snapshot of the current Entity set used to pick the skill dir layout. */
   knownEntities: Entity[];
@@ -133,7 +133,7 @@ export async function convertCommandToSkill(
   let skillWritten = false;
   try {
     await fs.mkdir(path.dirname(destPath), { recursive: true });
-    const tmp = `${destPath}.memmgmt-tmp-${process.pid}-${Date.now()}`;
+    const tmp = `${destPath}.the-memory-register-tmp-${process.pid}-${Date.now()}`;
     await fs.writeFile(tmp, skillContent, "utf8");
     await fs.rename(tmp, destPath);
     skillWritten = true;

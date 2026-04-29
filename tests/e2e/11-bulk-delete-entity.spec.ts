@@ -9,7 +9,7 @@ import path from "node:path";
 
 const FIXTURE = path.resolve(process.cwd(), "tests/fixtures/sample-claude-home");
 const COMMANDS_DIR = path.join(FIXTURE, "commands");
-const BACKUPS = path.join(FIXTURE, "memmgmt-backups");
+const BACKUPS = path.join(FIXTURE, "the-memory-register-backups");
 
 const THROWAWAY = "throwaway-to-delete";
 const THROWAWAY_FILE = path.join(COMMANDS_DIR, `${THROWAWAY}.md`);

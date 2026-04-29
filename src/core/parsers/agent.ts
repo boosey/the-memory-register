@@ -57,9 +57,9 @@ export function serializeAgent(p: ParsedAgent): string {
   const fm: Record<string, unknown> = {
     name: p.name,
     description: p.description,
-    enabled: p.enabled,
     ...p.extraFrontmatter,
   };
+  if (p.enabled === false) fm.enabled = false;
   if (p.tools.length > 0) fm.tools = p.tools;
   if (p.model) fm.model = p.model;
   if (p.author) fm.author = p.author;

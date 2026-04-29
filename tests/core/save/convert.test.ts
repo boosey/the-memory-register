@@ -12,7 +12,7 @@ let backupsDir: string;
 let cmdFile: string;
 
 beforeEach(async () => {
-  tmp = await fs.mkdtemp(path.join(os.tmpdir(), "memmgmt-cv-"));
+  tmp = await fs.mkdtemp(path.join(os.tmpdir(), "the-memory-register-cv-"));
   commandsDir = path.join(tmp, "commands");
   skillsDir = path.join(tmp, "skills");
   backupsDir = path.join(tmp, "backups");

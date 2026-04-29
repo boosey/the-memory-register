@@ -52,9 +52,9 @@ export async function getOrBuildGraph(): Promise<{
   if (payload && nodes) return { payload, nodes };
 
   const paths = resolveHomePaths();
-  const extra = process.env.MEMMGMT_EXTRA_PROJECTS
-    ? process.env.MEMMGMT_EXTRA_PROJECTS.split(path.delimiter).filter(Boolean)
-    : undefined;
+  const extra = process.env.THE_MEMORY_REGISTER_EXTRA_PROJECTS
+    ? process.env.THE_MEMORY_REGISTER_EXTRA_PROJECTS.split(path.delimiter).filter(Boolean)
+    : [];
   const { raws, ghostSlugs, slugMetadata, crawledAtMs } = await crawl({
     claudeHome: paths.claudeHome,
     ...(extra ? { knownProjectPaths: extra } : {}),

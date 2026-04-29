@@ -6,7 +6,7 @@ import { createBackup, listBackups } from "@/core/save/backup";
 
 let tmp: string;
 beforeEach(async () => {
-  tmp = await fs.mkdtemp(path.join(os.tmpdir(), "memmgmt-bk-"));
+  tmp = await fs.mkdtemp(path.join(os.tmpdir(), "the-memory-register-bk-"));
 });
 
 describe("backup", () => {

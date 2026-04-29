@@ -40,10 +40,14 @@ export function deriveProvides(entities: Entity[]): Relation[] {
 }
 
 // ── invokes ─────────────────────────────────────────────────────────────────
-// skill/command entity → skill/command entities that are mentioned in its body.
-// Uses simple name-based matching.
+// skill/command/agent entity → skill/command/agent entities that are mentioned 
+// in its body. Uses simple name-based matching.
 
-const INVOKE_TARGET_KINDS = new Set<Entity["type"]>(["skill", "command"]);
+const INVOKE_TARGET_KINDS = new Set<Entity["type"]>([
+  "skill",
+  "command",
+  "agent",
+]);
 const INVOKE_RE = /\/(\w[\w-]*)\b/g;
 
 export function deriveInvokes(entities: Entity[]): Relation[] {
@@ -59,7 +63,7 @@ export function deriveInvokes(entities: Entity[]): Relation[] {
   }
 
   for (const e of entities) {
-    if (e.type !== "skill" && e.type !== "command") continue;
+    if (e.type !== "skill" && e.type !== "command" && e.type !== "agent") continue;
     const body = (e.structured as { body?: string } | null)?.body ?? "";
     if (!body) continue;
 

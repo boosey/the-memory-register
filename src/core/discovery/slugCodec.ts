@@ -1,3 +1,5 @@
+import fs from "node:fs";
+
 // Claude Code's slug scheme:
 //   "/foo/bar"           ->  "-foo-bar"
 //   "C:\\Users\\boose"   ->  "C--Users-boose"
@@ -7,19 +9,70 @@ function isWindowsDriveSlug(slug: string): boolean {
   return /^[A-Za-z]--/.test(slug);
 }
 
-export function slugToPath(slug: string): string {
-  if (isWindowsDriveSlug(slug)) {
-    const drive = slug[0]!;
-    const rest = slug.slice(3);
-    const segments = decodeDashes(rest);
-    return `${drive}:\\${segments.join("\\")}`;
+/**
+ * Decodes a slug to a filesystem path. Performs greedy dash-as-separator
+ * parsing by default, but refined by filesystem-aware disambiguation if
+ * a synchronous `exists` probe is provided or if running in Node.
+ */
+export function slugToPath(slug: string, exists?: (p: string) => boolean): string {
+  const isWindows = isWindowsDriveSlug(slug);
+  const sep = isWindows ? "\\" : "/";
+  
+  let rest: string;
+  let prefix = "";
+  
+  if (isWindows) {
+    prefix = `${slug[0]!}:\\`;
+    rest = slug.slice(3);
+  } else if (slug.startsWith("-")) {
+    prefix = "/";
+    rest = slug.slice(1);
+  } else {
+    rest = slug;
   }
-  if (slug.startsWith("-")) {
-    const rest = slug.slice(1);
-    const segments = decodeDashes(rest);
-    return `/${segments.join("/")}`;
+  
+  const segments = decodeDashes(rest);
+  const greedy = prefix + segments.join(sep);
+
+  const check = exists ?? ((p: string) => {
+    try {
+      return typeof window === "undefined" && fs.existsSync(p);
+    } catch {
+      return false;
+    }
+  });
+
+  // Try greedy first
+  if (check(greedy)) return greedy;
+
+  // Greedy hit nothing. Try merging adjacent segments with dashes.
+  const found = findValidPathSync(prefix, segments, sep, check);
+  return found ?? greedy;
+}
+
+function findValidPathSync(
+  currentPrefix: string,
+  remaining: string[],
+  sep: string,
+  exists: (p: string) => boolean,
+): string | null {
+  if (remaining.length === 0) {
+    return exists(currentPrefix) ? currentPrefix : null;
   }
-  return decodeDashes(slug).join("/");
+
+  // Try using the first segment as a directory
+  const nextDir = currentPrefix + (currentPrefix.endsWith(sep) ? "" : sep) + remaining[0]!;
+  const hit = findValidPathSync(nextDir, remaining.slice(1), sep, exists);
+  if (hit) return hit;
+
+  // Try merging the first two segments with a dash
+  if (remaining.length >= 2) {
+    const merged = remaining[0]! + "-" + remaining[1]!;
+    const nextRemaining = [merged, ...remaining.slice(2)];
+    return findValidPathSync(currentPrefix, nextRemaining, sep, exists);
+  }
+
+  return null;
 }
 
 /**

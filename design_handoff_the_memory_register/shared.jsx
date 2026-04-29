@@ -1,4 +1,4 @@
-// Shared UI primitives for the three memmgmt variations.
+// Shared UI primitives for the three the-memory-register variations.
 // Editorial vibe: serif display, generous whitespace, monochrome ink,
 // provenance-tinted cards. No emoji. No icons from libraries.
 

@@ -2,7 +2,7 @@
   - main [ref=e2]:
     - generic [ref=e3]:
       - generic [ref=e4]:
-        - generic [ref=e5]: memmgmt
+        - generic [ref=e5]: the-memory-register
         - generic [ref=e6]: Trace entities, follow relationships, resolve and prune — all inline.
       - generic [ref=e7]: Signal Edition · v1.6
     - generic [ref=e8]: Loading…

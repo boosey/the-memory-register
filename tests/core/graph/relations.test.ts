@@ -132,12 +132,12 @@ describe("deriveAccretesFrom", () => {
         id: "m1",
         type: "memory",
         scope: "slug",
-        slugRef: "memmgmt",
+        slugRef: "the-memory-register",
       }),
     ];
     const slugMetadata: SlugMetadata[] = [
       {
-        slug: "memmgmt",
+        slug: "the-memory-register",
         projectPath: "/home/u/proj",
         sessionCount: 47,
         lastActiveMs: 100,
@@ -149,7 +149,7 @@ describe("deriveAccretesFrom", () => {
     expect(rels[0]).toMatchObject({
       kind: "accretes-from",
       from: "m1",
-      to: "slug:memmgmt",
+      to: "slug:the-memory-register",
       note: "47 sessions",
     });
   });

@@ -19,7 +19,7 @@ export interface BulkContext {
   backupsDir: string;
   /** Snapshot of current entities; used for identity-group lookups + scope math. */
   knownEntities: Entity[];
-  /** Resolved Claude home (~/.claude). Used to locate memmgmt-state.json. */
+  /** Resolved Claude home (~/.claude). Used to locate the-memory-register-state.json. */
   claudeHome: string;
 }
 
@@ -107,6 +107,10 @@ async function runDeleteShadowed(
         ? selectedInGroup[0]!
         : pickWinner(group);
 
+    // Identify the target scope for the winner. We promote to the highest 
+    // occupied scope in the group to ensure it truly wins.
+    const maxScope = pickWinner(group).scope;
+
     for (const copy of group) {
       if (copy.id === winner.id) continue;
       const res = await deleteFileEntity(copy, ctx);
@@ -120,6 +124,43 @@ async function runDeleteShadowed(
         };
       }
       affected.push(res.affected);
+    }
+
+    // Promotion logic: if the winner isn't already at maxScope, move it there.
+    if (winner.scope !== maxScope) {
+      const naturalWinner = pickWinner(group);
+      const promotedCtx: BulkContext = {
+        ...ctx,
+        knownEntities: ctx.knownEntities.map((e) =>
+          e.id === winner.id
+            ? {
+                ...e,
+                scopeRoot: naturalWinner.scopeRoot,
+                slugRef: naturalWinner.slugRef,
+              }
+            : e,
+        ),
+      };
+
+      const promotionRes = await runScopeMove(
+        {
+          action: "promote-scope",
+          entityIds: [winner.id],
+          targetScope: maxScope,
+        },
+        promotedCtx,
+        "up",
+      );
+      if (!promotionRes.ok) {
+        return {
+          ok: false,
+          action: req.action,
+          reason: promotionRes.reason,
+          message: `promotion failed: ${promotionRes.message}`,
+          partiallyAffected: affected,
+        };
+      }
+      affected.push(...promotionRes.affected);
     }
   }
   return { ok: true, action: req.action, affected };
@@ -479,10 +520,8 @@ function resolveDestFile(
       root = entity.slugRef ? path.join(ctx.claudeHome, "projects", entity.slugRef) : null;
       break;
     case "project":
-      root = entity.scopeRoot; // scopeRoot is the project root for project/local/slug entities
-      break;
     case "local":
-      root = entity.scopeRoot;
+      root = isFileBacked ? path.join(entity.scopeRoot, ".claude") : entity.scopeRoot;
       break;
   }
 
@@ -500,6 +539,8 @@ function resolveDestFile(
 
   // settings.json backed
   const settingsDir = (target === "project" || target === "local") ? path.join(root, ".claude") : root;
+  // Wait! if root already includes .claude, we don't want to double it.
+  // Actually, if it's not file-backed, root is still projectRoot.
   if (target === "local") return path.join(settingsDir, "settings.local.json");
   return path.join(settingsDir, "settings.json");
 }
@@ -554,7 +595,7 @@ async function runDeleteEntity(
 }
 
 // ── dismiss-stale / flag-for-review ────────────────────────────────────────
-// Persist marker entries to ~/.claude/memmgmt-state.json. The stale-detection
+// Persist marker entries to ~/.claude/the-memory-register-state.json. The stale-detection
 // layer consults this file at read-time.
 
 async function runMarker(
@@ -562,7 +603,7 @@ async function runMarker(
   ctx: BulkContext,
   bucket: "dismissedStale" | "flaggedForReview" | "keptAsOverride",
 ): Promise<BulkResponse> {
-  const markerFile = path.join(ctx.claudeHome, "memmgmt-state.json");
+  const markerFile = path.join(ctx.claudeHome, "the-memory-register-state.json");
   const state = await readState(markerFile);
   const now = Date.now();
   const list = (state[bucket] ??= []) as Array<{
@@ -605,16 +646,16 @@ async function runMarker(
   return { ok: true, action: req.action, affected };
 }
 
-interface MemmgmtState {
+interface TheMemoryRegisterState {
   dismissedStale?: Array<{ entityId: string; atMs: number }>;
   flaggedForReview?: Array<{ entityId: string; atMs: number }>;
   keptAsOverride?: Array<{ entityId: string; atMs: number }>;
 }
 
-async function readState(markerFile: string): Promise<MemmgmtState> {
+async function readState(markerFile: string): Promise<TheMemoryRegisterState> {
   try {
     const raw = await fs.readFile(markerFile, "utf8");
-    return JSON.parse(raw) as MemmgmtState;
+    return JSON.parse(raw) as TheMemoryRegisterState;
   } catch {
     return {};
   }

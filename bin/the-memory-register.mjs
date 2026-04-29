@@ -27,8 +27,8 @@ async function main() {
   const port = envPort ?? (await findFreePort(PORT_START, PORT_END));
   if (!port) {
     console.error(
-      `memmgmt: could not find a free port in ${PORT_START}-${PORT_END}.\n` +
-        `Try:  PORT=8080 npx memmgmt`,
+      `the-memory-register: could not find a free port in ${PORT_START}-${PORT_END}.\n` +
+        `Try:  PORT=8080 npx the-memory-register`,
     );
     process.exit(1);
   }
@@ -40,7 +40,7 @@ async function main() {
   await import(serverEntry);
 
   const url = `http://127.0.0.1:${port}`;
-  console.log(`memmgmt: serving on ${url}`);
+  console.log(`the-memory-register: serving on ${url}`);
   try {
     await open(url);
   } catch {
@@ -49,6 +49,6 @@ async function main() {
 }
 
 main().catch((err) => {
-  console.error("memmgmt: fatal", err);
+  console.error("the-memory-register: fatal", err);
   process.exit(1);
 });

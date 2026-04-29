@@ -8,7 +8,7 @@ let tmp: string;
 let src: string;
 
 beforeEach(async () => {
-  tmp = await fs.mkdtemp(path.join(os.tmpdir(), "memmgmt-pv-"));
+  tmp = await fs.mkdtemp(path.join(os.tmpdir(), "the-memory-register-pv-"));
   src = path.join(tmp, "CLAUDE.md");
   await fs.writeFile(src, "alpha\nbeta\n", "utf8");
 });

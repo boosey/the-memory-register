@@ -1,4 +1,4 @@
-# memmgmt — v2 Follow-ups
+# the-memory-register — v2 Follow-ups
 
 Notes from v1 build — items observed during implementation but explicitly out of scope for v1 per the design doc (§6). Record here, do not implement.
 
@@ -18,7 +18,7 @@ Notes from v1 build — items observed during implementation but explicitly out 
 
 ## `.fixture-project/` in our test fixtures is visible via slug-ish path on the dev machine
 
-**Observed:** When memmgmt runs against its own repo's `~/.claude/`, the fixture's `sample-claude-home` tree is NOT crawled (good — only the user's real `~/.claude/` is). Confirms discovery isolation. No action needed.
+**Observed:** When the-memory-register runs against its own repo's `~/.claude/`, the fixture's `sample-claude-home` tree is NOT crawled (good — only the user's real `~/.claude/` is). Confirms discovery isolation. No action needed.
 
 ## Override detection for `contains`
 
@@ -68,7 +68,7 @@ The following were surfaced by the Playwright E2E suite and the Chrome DevTools 
 
 **Spec file:** `tests/e2e/04-import-resolution.spec.ts` (test 1 passes because it asserts `edges.count() > 0`, which the single `overrides` edge satisfies)
 **Observed during visual gate:** With Inventory showing a live @import + dead @import on the global CLAUDE.md card ("⚠ dead @import"), switching to Graph surfaces all nodes but only one visible edge — the `overrides` connection between global and project-scope "Coding Standards". Expected: at least an `imports` edge to `imports-demo.md` and a visible dead-import marker.
-**Repro:** `PORT=5999 MEMMGMT_CLAUDE_HOME=$PWD/tests/fixtures/sample-claude-home MEMMGMT_EXTRA_PROJECTS=$PWD/tests/fixtures/sample-claude-home/.fixture-project node .next/standalone/server.js`, open http://127.0.0.1:5999/, click Graph tab.
+**Repro:** `PORT=5999 the-memory-register_CLAUDE_HOME=$PWD/tests/fixtures/sample-claude-home the-memory-register_EXTRA_PROJECTS=$PWD/tests/fixtures/sample-claude-home/.fixture-project node .next/standalone/server.js`, open http://127.0.0.1:5999/, click Graph tab.
 **Proposed v2 fix:** Audit `src/components/GraphView.tsx` edge filtering. Likely the React Flow edge mapping drops `imports`/`dead-import` edges whose target nodes are either synthetic (scope-root pseudo-nodes) or non-existent (dead imports). Render dead-import edges as dashed red lines terminating at a "missing target" placeholder node; render imports as solid gray lines to the imported-markdown node introduced by the fix above.
 
 ## v1.5 visual finding: Local scope column clipped on default viewport

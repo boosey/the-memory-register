@@ -37,9 +37,9 @@ export function serializeSkill(p: ParsedSkill): string {
   const fm: Record<string, unknown> = {
     name: p.name,
     description: p.description,
-    enabled: p.enabled,
     ...p.extraFrontmatter,
   };
+  if (p.enabled === false) fm.enabled = false;
   if (p.author) fm.author = p.author;
   return joinFrontmatter(fm, p.body);
 }

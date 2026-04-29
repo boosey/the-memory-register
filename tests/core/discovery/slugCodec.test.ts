@@ -1,10 +1,18 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { slugToPath, pathToSlug } from "@/core/discovery/slugCodec";
+import fs from "node:fs";
+
+vi.mock("node:fs", () => ({
+  default: {
+    existsSync: vi.fn(),
+  },
+}));
 
 describe("slugCodec", () => {
   it("decodes Windows-style slugs to absolute paths", () => {
-    expect(slugToPath("C--Users-boose-projects-memmgmt")).toBe(
-      "C:\\Users\\boose\\projects\\memmgmt",
+    const exists = (p: string) => p === "C:\\Users\\boose\\projects\\the-memory-register";
+    expect(slugToPath("C--Users-boose-projects-the-memory-register", exists)).toBe(
+      "C:\\Users\\boose\\projects\\the-memory-register",
     );
   });
 
@@ -18,8 +26,8 @@ describe("slugCodec", () => {
   });
 
   it("round-trips Windows paths", () => {
-    const slug = pathToSlug("C:\\Users\\boose\\projects\\memmgmt");
-    expect(slugToPath(slug)).toBe("C:\\Users\\boose\\projects\\memmgmt");
+    const slug = pathToSlug("C:\\Users\\boose\\projects\\the-memory-register");
+    expect(slugToPath(slug)).toBe("C:\\Users\\boose\\projects\\the-memory-register");
   });
 
   it("handles dashes inside path segments via escaped double-dash", () => {

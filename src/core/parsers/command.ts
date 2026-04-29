@@ -33,9 +33,9 @@ export function parseCommand(src: string): ParsedCommand {
 export function serializeCommand(p: ParsedCommand): string {
   const fm: Record<string, unknown> = {
     description: p.description,
-    enabled: p.enabled,
     ...p.extraFrontmatter,
   };
+  if (p.enabled === false) fm.enabled = false;
   if (p.author) fm.author = p.author;
   return joinFrontmatter(fm, p.body);
 }

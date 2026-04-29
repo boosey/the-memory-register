@@ -17,13 +17,13 @@ export interface ResolveOverride {
 export function resolveHomePaths(override?: ResolveOverride): HomePaths {
   const claudeHome =
     override?.claudeHome
-    ?? process.env.MEMMGMT_CLAUDE_HOME
+    ?? process.env.THE_MEMORY_REGISTER_CLAUDE_HOME
     ?? path.join(override?.home ?? os.homedir(), ".claude");
   return {
     claudeHome,
     projectsDir: path.join(claudeHome, "projects"),
     pluginsDir: path.join(claudeHome, "plugins"),
-    backupsDir: path.join(claudeHome, "memmgmt-backups"),
-    viewPrefsFile: path.join(claudeHome, "memmgmt-settings.json"),
+    backupsDir: path.join(claudeHome, "the-memory-register-backups"),
+    viewPrefsFile: path.join(claudeHome, "the-memory-register-settings.json"),
   };
 }

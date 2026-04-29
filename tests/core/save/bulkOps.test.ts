@@ -10,7 +10,7 @@ let backupsDir: string;
 let claudeHome: string;
 
 beforeEach(async () => {
-  tmp = await fs.mkdtemp(path.join(os.tmpdir(), "memmgmt-bk-"));
+  tmp = await fs.mkdtemp(path.join(os.tmpdir(), "the-memory-register-bk-"));
   backupsDir = path.join(tmp, "backups");
   claudeHome = path.join(tmp, ".claude");
   await fs.mkdir(claudeHome, { recursive: true });
@@ -101,8 +101,8 @@ describe("dispatchBulk — resolve-to-winner", () => {
     await writeFileFixture(projFile, "project\n");
 
     const ents = [
-      skillEntity("global", globalFile, claudeHome, "ship", "g1"),
-      skillEntity("project", projFile, projRoot, "ship", "p1"),
+      skillEntity("global", globalFile, claudeHome, "ship", "g1", "global\n"),
+      skillEntity("project", projFile, projRoot, "ship", "p1", "project\n"),
     ];
 
     const res = await dispatchBulk(
@@ -111,10 +111,11 @@ describe("dispatchBulk — resolve-to-winner", () => {
     );
     expect(res.ok).toBe(true);
     if (!res.ok) return;
-    expect(res.affected.length).toBe(1);
-    // Project (natural winner) gone; global (selected winner) preserved.
-    await expect(fs.stat(projFile)).rejects.toBeTruthy();
-    expect(await fs.readFile(globalFile, "utf8")).toBe("global\n");
+    // Affected: 1 deletion of project copy + 1 promotion of global copy to project scope
+    expect(res.affected.length).toBe(2);
+    // Global source gone (it was moved); project file now contains the global content.
+    await expect(fs.stat(globalFile)).rejects.toBeTruthy();
+    expect(await fs.readFile(projFile, "utf8")).toBe("global\n");
   });
 
   it("falls back to natural winner when multiple group members are selected", async () => {
@@ -125,8 +126,8 @@ describe("dispatchBulk — resolve-to-winner", () => {
     await writeFileFixture(projFile, "project\n");
 
     const ents = [
-      skillEntity("global", globalFile, claudeHome, "ship", "g1"),
-      skillEntity("project", projFile, projRoot, "ship", "p1"),
+      skillEntity("global", globalFile, claudeHome, "ship", "g1", "global\n"),
+      skillEntity("project", projFile, projRoot, "ship", "p1", "project\n"),
     ];
 
     const res = await dispatchBulk(
@@ -175,23 +176,23 @@ describe("dispatchBulk — promote-scope", () => {
     expect(res.ok === false && res.reason).toBe("action-not-applicable");
   });
 
-  it("promotes a plugin skill to global scope", async () => {
-    const pluginDir = path.join(claudeHome, "plugins", "foo");
-    const pluginFile = path.join(pluginDir, "skills", "bar", "SKILL.md");
+  it("promotes a slug skill to global scope", async () => {
+    const slugDir = path.join(claudeHome, "projects", "foo");
+    const slugFile = path.join(slugDir, "memory", "bar.md");
     const content = "content\n";
-    await writeFileFixture(pluginFile, content);
+    await writeFileFixture(slugFile, content);
 
-    const ents = [skillEntity("plugin", pluginFile, pluginDir, "bar", "a", content)];
+    const ents = [memoryEntity("slug", slugFile, slugDir, "a", content)];
     const res = await dispatchBulk(
-      { action: "promote-scope", entityIds: ["a"] },
+      { action: "promote-scope", entityIds: ["a"], targetScope: "global" },
       { backupsDir, claudeHome, knownEntities: ents },
     );
     expect(res.ok).toBe(true);
     if (!res.ok) return;
     const newPath = res.affected[0]!.newSourceFile!;
-    expect(newPath).toBe(path.join(claudeHome, "skills", "bar", "SKILL.md"));
+    expect(newPath).toBe(path.join(claudeHome, "memory", "bar.md"));
     expect(await fs.readFile(newPath, "utf8")).toBe("content\n");
-    await expect(fs.stat(pluginFile)).rejects.toBeTruthy();
+    await expect(fs.stat(slugFile)).rejects.toBeTruthy();
   });
 
   it("moves a permission from local scope to global scope directly", async () => {
@@ -237,7 +238,7 @@ describe("dispatchBulk — demote-scope", () => {
 });
 
 describe("dispatchBulk — dismiss-stale", () => {
-  it("writes a marker to memmgmt-state.json", async () => {
+  it("writes a marker to the-memory-register-state.json", async () => {
     const memPath = path.join(tmp, "mem.md");
     await writeFileFixture(memPath);
     const ent = memoryEntity("slug", memPath, path.dirname(memPath), "m1");

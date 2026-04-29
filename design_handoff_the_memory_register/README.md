@@ -1,4 +1,4 @@
-# Handoff: memmgmt — Claude Code config & memory manager
+# Handoff: the-memory-register — Claude Code config & memory manager
 
 > A visual, editable map of a Claude Code user's entire configuration surface
 > (standing instructions, permissions, skills, memories, hooks, plugins, env
@@ -14,7 +14,7 @@ The HTML + JSX files in this folder are **design references**, not
 production code. They are an interactive high-fidelity prototype built in
 plain React-via-Babel in a single HTML page so we could iterate visually.
 
-Your job is to **recreate these designs in the real memmgmt codebase** —
+Your job is to **recreate these designs in the real the-memory-register codebase** —
 wiring them to the actual filesystem watcher, CLAUDE.md parser, override
 engine, and live edit layer described in `original-brief.md`. The prototype
 runs against mock data (`data.js`); production needs the real data model.
@@ -36,7 +36,7 @@ Tailwind, styled-components, etc.) — the tokens are enumerated below.
 
 | File | Role |
 |---|---|
-| `memmgmt.html` | Entry point. Loads React + Babel, wires the canvas. |
+| `the-memory-register.html` | Entry point. Loads React + Babel, wires the canvas. |
 | `data.js` | Mock data: entities, relations, scopes, authors, health issues. **Replace entirely** — this is the shape the real data model should expose. |
 | `design-canvas.jsx` | A pan/zoom canvas wrapper used purely to stage one large artboard. In production the canvas frame is not needed — the app IS the artboard. |
 | `shared.jsx` | Editorial typography tokens, masthead, provenance pills, health ribbon, author/scope helpers, override-grouping logic. |
@@ -52,7 +52,7 @@ python3 -m http.server 8080
 # or
 npx serve .
 ```
-Open `http://localhost:8080/memmgmt.html`. No build step.
+Open `http://localhost:8080/the-memory-register.html`. No build step.
 
 ---
 
@@ -63,7 +63,7 @@ understands Claude Code's object model. It is NOT a settings page with a
 sidebar of preferences.
 
 ### Masthead (top strip)
-- Wordmark "memmgmt" in Inter Tight, weight 600, letter-spacing −0.02em, ~26px.
+- Wordmark "the-memory-register" in Inter Tight, weight 600, letter-spacing −0.02em, ~26px.
 - Subtitle to its right in smallcaps: "Trace entities, follow relationships, resolve and prune — all inline."
 - Edition tag on the far right, smallcaps + mono: "Signal Edition · v4".
 - 1px rule below.

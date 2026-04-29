@@ -10,7 +10,7 @@ import path from "node:path";
 
 const FIXTURE = path.resolve(process.cwd(), "tests/fixtures/sample-claude-home");
 const SETTINGS_FILE = path.join(FIXTURE, "settings.json");
-const BACKUPS = path.join(FIXTURE, "memmgmt-backups");
+const BACKUPS = path.join(FIXTURE, "the-memory-register-backups");
 
 test("permission edit (Allow → Ask) → save → settings.json moved rule → undo restores", async ({
   page,

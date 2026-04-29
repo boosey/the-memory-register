@@ -1,4 +1,4 @@
-// Canonical data model for memmgmt v1.6+ — Entity, Relation, Detection, PseudoNode.
+// Canonical data model for the-memory-register v1.6+ — Entity, Relation, Detection, PseudoNode.
 // Consumed by /api/graph and every UI surface.
 //
 // Earlier internal shapes (ArtifactNode / GraphEdge in types.ts) continue to exist
@@ -135,7 +135,7 @@ export interface Relation {
 export interface SlugPseudoNode {
   id: string;                // 'slug:<name>'
   kind: "slug";
-  name: string;              // decoded slug (e.g. 'memmgmt')
+  name: string;              // decoded slug (e.g. 'the-memory-register')
   projectPath: string;
   sessionCount: number;
   lastActiveMs: number;
@@ -183,7 +183,7 @@ export interface Detection {
   occurrences: DetectionOccurrence[];
 }
 
-// Registry of conventions memmgmt watches for. Adding a new convention here
+// Registry of conventions the-memory-register watches for. Adding a new convention here
 // means the accordion will render it (once parsers start emitting). Removing
 // means the convention has graduated to a first-class model.
 export const DETECTION_CONVENTIONS = {

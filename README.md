@@ -5,7 +5,7 @@ Local-only web UI for managing your Claude Code configuration surface — CLAUDE
 ## Install & run
 
 ```bash
-npx memmgmt       # or: bunx memmgmt
+npx the-memory-register       # or: bunx the-memory-register
 ```
 
 Opens `http://127.0.0.1:<port>` in your default browser. Ctrl-C to exit.
@@ -22,7 +22,7 @@ No LLM, no cloud, no account. Your filesystem is the database.
 ## Custom port
 
 ```bash
-PORT=8080 npx memmgmt
+PORT=8080 npx the-memory-register
 ```
 
 Default port probing tries 5174–5199 in order. Override `PORT` if you need a specific one.
@@ -40,7 +40,7 @@ Default port probing tries 5174–5199 in order. Override `PORT` if you need a s
 ## Editing & safety
 
 - Diff preview before every save.
-- Originals backed up to `~/.claude/memmgmt-backups/<iso>/<relative-path>`.
+- Originals backed up to `~/.claude/the-memory-register-backups/<iso>/<relative-path>`.
 - Undo restores the most recent backup.
 - Concurrent-edit detection via file mtime.
 
@@ -51,7 +51,7 @@ pnpm install
 pnpm dev            # hot-reload dev server
 pnpm test           # vitest
 pnpm typecheck
-pnpm build && pnpm memmgmt:launch-dev   # standalone smoke
+pnpm build && pnpm the-memory-register:launch-dev   # standalone smoke
 ```
 
 ## License

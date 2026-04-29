@@ -1,18 +1,18 @@
 {
-  "name": "memmgmt",
+  "name": "the-memory-register",
   "version": "0.1.0",
   "description": "Local UI for managing Claude Code configuration surface.",
   "license": "MIT",
   "keywords": [
     "claude-code",
-    "memmgmt",
+    "the-memory-register",
     "config",
     "skills",
     "commands"
   ],
   "private": true,
   "bin": {
-    "memmgmt": "./bin/memmgmt.mjs"
+    "the-memory-register": "./bin/the-memory-register.mjs"
   },
   "files": [
     ".next/standalone",
@@ -36,7 +36,7 @@
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:report": "playwright show-report",
     "typecheck": "tsc --noEmit",
-    "memmgmt:launch-dev": "node bin/memmgmt.mjs",
+    "the-memory-register:launch-dev": "node bin/the-memory-register.mjs",
     "postbuild": "node scripts/copy-standalone-assets.mjs",
     "prepublishOnly": "pnpm build"
   },

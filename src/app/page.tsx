@@ -298,6 +298,7 @@ function Loaded({
             entityMatchesSignalFilter(
               e,
               signalFilter.source,
+              signalFilter.provider,
               signalFilter.status,
               signalFilter.showInformational,
             ),
@@ -308,6 +309,7 @@ function Loaded({
       healthFilter.active,
       graph.pseudoNodes,
       signalFilter.source,
+      signalFilter.provider,
       signalFilter.status,
       signalFilter.showInformational,
     ],

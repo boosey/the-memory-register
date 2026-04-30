@@ -1,10 +1,15 @@
 "use client";
-import type { Entity, GraphPayload, PseudoNode } from "@/core/entities";
+import type { Entity, GraphPayload, PseudoNode, SlugPseudoNode } from "@/core/entities";
 import {
   useHealthFilter,
   type HealthFilterKey,
 } from "@/hooks/useHealthFilter";
-import { useSignalFilter, type SourceFilter, type StatusFilter } from "@/hooks/useSignalFilter";
+import { 
+  useSignalFilter, 
+  type SourceFilter, 
+  type ProviderFilter, 
+  type StatusFilter 
+} from "@/hooks/useSignalFilter";
 import { ProjectSelect } from "./ProjectSelect";
 
 interface HealthRibbonProps {
@@ -116,6 +121,7 @@ export function HealthRibbon({
     >
       <div className="flex items-center gap-6">
         <ProjectSelect slugs={slugs} />
+        
         <div className="flex items-center gap-2 border-l border-[color:var(--rule)] pl-6">
           <span className="smallcaps text-[9.5px] text-[color:var(--text-muted)]">Source</span>
           <select
@@ -125,11 +131,24 @@ export function HealthRibbon({
           >
             <option value="all">All</option>
             <option value="anthropic">Anthropic</option>
-            <option value="community">Community</option>
+            <option value="community">Marketplace</option>
             <option value="you">You</option>
-            <option value="plugin">Plugin (any)</option>
           </select>
         </div>
+
+        <div className="flex items-center gap-2 border-l border-[color:var(--rule)] pl-6">
+          <span className="smallcaps text-[9.5px] text-[color:var(--text-muted)]">Provider</span>
+          <select
+            value={signalFilter.provider}
+            onChange={(e) => signalFilter.setProvider(e.target.value as ProviderFilter)}
+            className="rounded-sm border border-[color:var(--rule)] bg-[color:var(--paper)] px-1 py-0.5 font-mono text-[11px] outline-none"
+          >
+            <option value="all">All</option>
+            <option value="plugin">Plugin</option>
+            <option value="standalone">Standalone</option>
+          </select>
+        </div>
+
         <div className="flex items-center gap-2 border-l border-[color:var(--rule)] pl-6">
           <span className="smallcaps text-[9.5px] text-[color:var(--text-muted)]">Status</span>
           <select
@@ -142,6 +161,7 @@ export function HealthRibbon({
             <option value="disabled">Disabled</option>
           </select>
         </div>
+
         <div className="flex items-center gap-2 border-l border-[color:var(--rule)] pl-6">
           <span className="smallcaps text-[9.5px] text-[color:var(--text-muted)]">Informational</span>
           <select
@@ -153,10 +173,12 @@ export function HealthRibbon({
             <option value="show">Show</option>
           </select>
         </div>
+        
         <div className="smallcaps ml-4 text-[9.5px] text-[color:var(--text-muted)]">
           Health
         </div>
       </div>
+      
       {chips.map((c) => {
         const active = filter.active === c.key;
         return (
@@ -195,9 +217,12 @@ export function HealthRibbon({
           </button>
         );
       })}
+      
       <span className="flex-1" />
+      
       {(filter.active ||
         signalFilter.source !== "all" ||
+        signalFilter.provider !== "all" ||
         signalFilter.status !== "all" ||
         signalFilter.showInformational) && (
         <button
@@ -212,6 +237,7 @@ export function HealthRibbon({
           clear filters
         </button>
       )}
+      
       <button
         type="button"
         onClick={onManageGhosts}
@@ -226,6 +252,7 @@ export function HealthRibbon({
       >
         {ghosts} ghost slug{ghosts === 1 ? "" : "s"}
       </button>
+      
       <span
         className="font-mono text-[10px] text-[color:var(--ink)]"
         style={{ letterSpacing: "0.08em" }}

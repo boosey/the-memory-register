@@ -13,11 +13,17 @@ export function EnvVarEditor({
   onApiReady,
   onStanzasChange,
 }: EnvVarEditorProps) {
-  const sd = (entity.structured ?? {}) as { name?: string; value?: string };
+  const sd = (entity.structured ?? {}) as { name?: string; value?: unknown };
   const [name, setName] = useState(
     (sd.name ?? entity.title ?? "").toUpperCase(),
   );
-  const [value, setValue] = useState(sd.value ?? entity.intent ?? "");
+
+  const initialValue =
+    typeof sd.value === "object" && sd.value !== null
+      ? JSON.stringify(sd.value, null, 2)
+      : String(sd.value ?? entity.intent ?? "");
+
+  const [value, setValue] = useState(initialValue);
   const [secret, setSecret] = useState(false);
   const [reveal, setReveal] = useState(false);
 
@@ -29,7 +35,21 @@ export function EnvVarEditor({
     onApiReady({
       currentTitle: name,
       stanzas: [name],
-      getSerializedContent: () => buildNextContentFor(entity, { name, value }),
+      getSerializedContent: () => {
+        let finalValue: unknown = value;
+        try {
+          // If it was an object initially, or it looks like one, try to parse it.
+          if (
+            (value.startsWith("{") && value.endsWith("}")) ||
+            (value.startsWith("[") && value.endsWith("]"))
+          ) {
+            finalValue = JSON.parse(value);
+          }
+        } catch {
+          // ignore parse errors, keep as string
+        }
+        return buildNextContentFor(entity, { name, value: finalValue });
+      },
     });
   }, [name, value, entity, onApiReady]);
 
@@ -47,11 +67,17 @@ export function EnvVarEditor({
       </FormRow>
       <FormRow label="Value">
         <div className="flex gap-[6px]">
-          <input
-            type={secret && !reveal ? "password" : "text"}
+          <textarea
+            rows={Math.max(2, value.split("\n").length)}
             value={value}
             onChange={(e) => setValue(e.target.value)}
-            className={`${monoClass()} flex-1`}
+            className={`${monoClass()} flex-1 resize-none overflow-hidden py-2`}
+            style={
+              {
+                minHeight: "38px",
+                WebkitTextSecurity: secret && !reveal ? "disc" : "none",
+              } as React.CSSProperties
+            }
           />
           {secret && (
             <button

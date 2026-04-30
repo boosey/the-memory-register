@@ -93,7 +93,7 @@ function applySettingsEntry(
     const i = match ? Number(match[1]) : list.length;
     list[i] = entry.value;
   } else if (entry.kind === "env") {
-    const env = (raw.env ??= {}) as Record<string, string>;
+    const env = (raw.env ??= {}) as Record<string, unknown>;
     env[entry.name] = entry.value;
   } else if (entry.kind === "hook") {
     const hooks = (raw.hooks ??= {}) as Record<string, unknown[]>;

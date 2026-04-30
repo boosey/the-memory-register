@@ -116,7 +116,7 @@ export function RightRail({
     }
   }
 
-  async function handleSave() {
+  async function handleSave(isNew = false) {
     setPending("save");
     setError(null);
     try {
@@ -128,8 +128,8 @@ export function RightRail({
         body: JSON.stringify({
           sourceFile,
           scopeRoot,
-          nextContent: api.getSerializedContent(),
-          expectedMtimeMs: api.expectedMtimeMs ?? entity.mtimeMs,
+          nextContent: api.getSerializedContent({ isNew }),
+          expectedMtimeMs: isNew ? undefined : (api.expectedMtimeMs ?? entity.mtimeMs),
         }),
       });
       const j = await r.json();
@@ -140,7 +140,9 @@ export function RightRail({
       showUndoToast({
         sourceFile,
         scopeRoot,
-        label: `Saved ${typeLabel.toLowerCase()} · ${entity.title}`,
+        label: isNew
+          ? `Added new ${typeLabel.toLowerCase()}`
+          : `Saved ${typeLabel.toLowerCase()} · ${entity.title}`,
       });
       onSaved();
     } catch (e: unknown) {
@@ -149,6 +151,8 @@ export function RightRail({
       setPending(null);
     }
   }
+
+  const supportsSaveAsNew = entity.type === "permission" || entity.type === "hook";
 
   return (
     <div
@@ -175,7 +179,7 @@ export function RightRail({
         </button>
         <button
           type="button"
-          onClick={handleSave}
+          onClick={() => handleSave(false)}
           disabled={pending !== null}
           className={primary.className}
           style={primary.style}
@@ -183,6 +187,18 @@ export function RightRail({
         >
           {pending === "save" ? "saving…" : "Save with backup"}
         </button>
+        {supportsSaveAsNew && (
+          <button
+            type="button"
+            onClick={() => handleSave(true)}
+            disabled={pending !== null}
+            className={ghost.className}
+            style={ghost.style}
+            data-testid="right-rail-save-new"
+          >
+            Save as New
+          </button>
+        )}
         {!(entity.plugin && entity.type !== "plugin") && (
           <button
             type="button"

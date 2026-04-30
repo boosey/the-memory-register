@@ -1,7 +1,7 @@
 import type { Entity } from "@/core/entities";
 
 export interface EditorApi {
-  getSerializedContent: () => string;
+  getSerializedContent: (options?: { isNew?: boolean }) => string;
   currentTitle?: string;
   /** Strings that identify the section(s) being edited (e.g. headings, keys).
    * Used by DiffPreviewModal to scroll to and highlight the changes. */

@@ -20,6 +20,7 @@ export function SignalNode({ entities, isWinner, isShadowed }: SignalNodeProps) 
   const first = entities[0]!;
   const tint = AUTHOR_TINT[first.author];
   const count = entities.length;
+  const isEnabled = first.enabled !== false;
 
   // For the node icon/state, we look at the individual copies.
   // If ANY of them are winners, the cell is a winner.
@@ -36,12 +37,14 @@ export function SignalNode({ entities, isWinner, isShadowed }: SignalNodeProps) 
         className={[
           "relative flex size-6 items-center justify-center rounded-full border transition-all",
           cellIsWinner
-            ? "border-[color:var(--ink)] bg-[oklch(0.62_0.17_145)] text-white shadow-[0_0_0_1px_var(--ink)]"
+            ? (isEnabled
+                ? "border-[color:var(--ink)] bg-[oklch(0.62_0.17_145)] text-white shadow-[0_0_0_1px_var(--ink)]"
+                : "border-[color:var(--rule)] bg-[oklch(0.95_0.01_55)] text-[color:var(--text-muted)] shadow-[0_0_0_1px_var(--rule)]")
             : "border-[color:var(--rule)] bg-[oklch(0.95_0.01_55)] text-[color:var(--text-muted)]",
           cellIsShadowed ? "opacity-40" : "",
         ].join(" ")}
         style={{
-          boxShadow: cellIsWinner ? `0 0 0 2px ${tint}` : undefined,
+          boxShadow: cellIsWinner && isEnabled ? `0 0 0 2px ${tint}` : undefined,
         }}
       >
         {cellIsWinner ? (

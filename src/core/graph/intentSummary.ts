@@ -47,7 +47,13 @@ export function deriveIntentSummary(input: InputLike): string {
 function summarizeSettingsEntry(sd: Record<string, unknown>): string {
   if (sd.kind === "permission") return `${sd.entryKey} → "${sd.value}"`;
   if (sd.kind === "hook") return `${sd.event} / ${sd.matcher}`;
-  if (sd.kind === "env") return `${sd.name}=${sd.value}`;
+  if (sd.kind === "env") {
+    const val =
+      typeof sd.value === "object" && sd.value !== null
+        ? JSON.stringify(sd.value)
+        : String(sd.value);
+    return `${sd.name}=${val}`;
+  }
   if (sd.kind === "other") return `${sd.key}`;
   return "";
 }

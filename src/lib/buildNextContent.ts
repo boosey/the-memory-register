@@ -45,17 +45,19 @@ export interface StandingInstructionDraft {
 export interface PermissionDraft {
   group: "allow" | "deny" | "ask";
   value: string;
+  isNew?: boolean;
 }
 
 export interface HookDraft {
   event: string;
   matcher: string;
   hooks: unknown[];
+  isNew?: boolean;
 }
 
 export interface EnvDraft {
   name: string;
-  value: string;
+  value: unknown;
 }
 
 export interface KeybindingDraft {
@@ -155,14 +157,16 @@ function buildPermission(entity: Entity, draft: PermissionDraft): string {
 
   const permissions = (raw.permissions ??= {}) as Record<string, string[]>;
 
-  // If group changed, remove from old group first.
-  if (draft.group !== currentGroup && idx !== undefined) {
+  const isUpdatingSameGroup = !draft.isNew && draft.group === currentGroup && idx !== undefined;
+
+  // If group changed and we are NOT saving as new, remove from old group first.
+  if (!draft.isNew && draft.group !== currentGroup && idx !== undefined) {
     const oldList = (permissions[currentGroup] ??= []);
     if (idx < oldList.length) oldList.splice(idx, 1);
   }
 
   const list = (permissions[draft.group] ??= []);
-  if (draft.group === currentGroup && idx !== undefined && idx < list.length) {
+  if (isUpdatingSameGroup && idx < list.length) {
     list[idx] = draft.value;
   } else {
     list.push(draft.value);
@@ -180,15 +184,17 @@ function buildHook(entity: Entity, draft: HookDraft): string {
 
   const hooks = (raw.hooks ??= {}) as Record<string, unknown[]>;
 
-  // If event changed, drop the old entry.
-  if (currentEvent !== draft.event && idx !== undefined) {
+  const isUpdatingSameEvent = !draft.isNew && currentEvent === draft.event && idx !== undefined;
+
+  // If event changed and we are NOT saving as new, drop the old entry.
+  if (!draft.isNew && currentEvent !== draft.event && idx !== undefined) {
     const oldList = (hooks[currentEvent] ??= []);
     if (idx < oldList.length) oldList.splice(idx, 1);
   }
 
   const list = (hooks[draft.event] ??= []);
   const next = { matcher: draft.matcher, hooks: draft.hooks };
-  if (currentEvent === draft.event && idx !== undefined && idx < list.length) {
+  if (isUpdatingSameEvent && idx < list.length) {
     list[idx] = next;
   } else {
     list.push(next);
@@ -201,7 +207,7 @@ function buildEnv(entity: Entity, draft: EnvDraft): string {
   const parsed = parseSettings(entity.rawContent);
   const raw = JSON.parse(JSON.stringify(parsed.raw)) as Record<string, unknown>;
   const loc = settingsEntryLocation(entity);
-  const env = (raw.env ??= {}) as Record<string, string>;
+  const env = (raw.env ??= {}) as Record<string, unknown>;
   if (loc.name && loc.name !== draft.name) delete env[loc.name];
   env[draft.name] = draft.value;
   return serializeSettings({ ...parsed, raw });

@@ -14,7 +14,7 @@ export type SettingsEntry =
       matcher: string;
       hooks: unknown[];
     }
-  | { kind: "env"; entryKey: string; name: string; value: string }
+  | { kind: "env"; entryKey: string; name: string; value: unknown }
   | {
       kind: "mcp-server";
       entryKey: string;

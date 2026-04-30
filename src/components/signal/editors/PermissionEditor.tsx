@@ -64,10 +64,11 @@ export function PermissionEditor({
   useEffect(() => {
     onApiReady({
       stanzas: [ruleValue],
-      getSerializedContent: () =>
+      getSerializedContent: (options) =>
         buildNextContentFor(entity, {
           group: effect,
           value: ruleValue,
+          isNew: options?.isNew,
         }),
     });
   }, [effect, ruleValue, entity, onApiReady]);
@@ -75,15 +76,23 @@ export function PermissionEditor({
   return (
     <div>
       <FormRow label="Tool" hint="Which tool family this permission applies to.">
-        <div className="flex flex-wrap gap-[6px]">
-          {options.map((t) => (
-            <Chip
-              key={t}
-              label={t}
-              active={tool === t}
-              onClick={() => setTool(t)}
-            />
-          ))}
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-wrap gap-[6px]">
+            {TOOL_OPTIONS.map((t) => (
+              <Chip
+                key={t}
+                label={t}
+                active={tool === t}
+                onClick={() => setTool(t)}
+              />
+            ))}
+          </div>
+          <input
+            value={tool}
+            onChange={(e) => setTool(e.target.value)}
+            placeholder="Custom tool name (e.g. mcp__...)"
+            className={monoClass()}
+          />
         </div>
       </FormRow>
       <FormRow
